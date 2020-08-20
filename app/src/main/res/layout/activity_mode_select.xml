@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择模式"
+        android:textStyle="italic"
+        android:textSize="25sp"
+        android:textColor="@color/colorAccent"
+        android:layout_marginBottom="30dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/black" />
+
+    <TextView
+        android:id="@+id/mode_0"
+        style="@style/ModeSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="简单" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/black" />
+
+    <TextView
+        android:id="@+id/mode_1"
+        style="@style/ModeSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="中等" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/black" />
+
+    <TextView
+        android:id="@+id/mode_2"
+        style="@style/ModeSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="困难" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/black" />
+
+    <TextView
+        android:id="@+id/mode_3"
+        style="@style/ModeSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="专家" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/black" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_parent"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <TextView
+            android:id="@+id/statistics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            app:layout_constraintBottom_toBottomOf="@+id/bottom_parent"
+            app:layout_constraintRight_toRightOf="@id/bottom_parent"
+            android:text="统计" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
