@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -30,8 +29,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private LinkedList<ArrayList<CellHistoryBean>> mHistoryList = new LinkedList<>();
 
     private Paint mBoardPaint;
-    private float[] mBoardLines;
-    private float[] mInnerLines;
     private Paint mInnerPaint;
     private float mCellWidth;
     private float mTextOffsetY;
@@ -44,8 +41,8 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private Paint mMarkPaint;
     private float mMarkTextOffsetY;
     private ISolveListener mSolveListener;
-    private int mAnimProgress = 100;
-    private BoardPresenter mBoardPresenter;
+    private int mAnimProgress = 200;
+    private BoardPresenter mPresenter;
 
     public SudoBoard(Context context) {
         this(context, null);
@@ -85,12 +82,11 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         Paint.FontMetrics metrics = mMarkPaint.getFontMetrics();
         mMarkTextOffsetY = (metrics.descent - metrics.ascent) / 2 - metrics.descent;
 
-        mBoardPresenter = new BoardPresenter(this);
+        mPresenter = new BoardPresenter(this);
     }
 
     private void resetTextSize(int x, int y, int progress) {
-        int offset = mBoardPresenter.getAnimStartOffset(x, y);
-        mTextPaint.setTextSize(70f * progress / 100);
+        mTextPaint.setTextSize(70f * mPresenter.getRelativeProgress(x, y, progress));
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         mTextOffsetY = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
     }
@@ -98,7 +94,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     public void initData(@NonNull Integer[][] data) {
         mExamData = data;
         mTmpData = Arithmetic.copySudo(mExamData);
-        mBoardPresenter.doInflateAnim();
+        mPresenter.doInflateAnim();
     }
 
     @Override
@@ -148,8 +144,8 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 }
             }
         }
-        canvas.drawLines(getInnerLines(), mInnerPaint);
-        canvas.drawLines(getBoardLines(), mBoardPaint);
+        canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
+        canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
     }
 
     @Override
@@ -173,26 +169,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
             invalidate();
         }
         return true;
-    }
-
-    private float[] getInnerLines() {
-        if (mInnerLines == null) {
-            mInnerLines = SudoUtils.getInnerLines(getCellWidth());
-        }
-        return mInnerLines;
-    }
-
-    private float[] getBoardLines() {
-        if (mBoardLines == null) {
-            float perWidth = getMeasuredWidth() * 1.0f / 3;
-            mBoardLines = new float[]{
-                    0, perWidth, perWidth * 3, perWidth,
-                    0, perWidth * 2, perWidth * 3, perWidth * 2,
-                    perWidth, 0, perWidth, perWidth * 3,
-                    perWidth * 2, 0, perWidth * 2, perWidth * 3
-            };
-        }
-        return mBoardLines;
     }
 
     private float getCellWidth() {
@@ -224,6 +200,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 boolean success = Arithmetic.checkResult(mTmpData);
                 Toast.makeText(getContext(), success ? "恭喜你！完成了这一关！5s后进入下一关！" : "还有错误喔！", Toast.LENGTH_SHORT).show();
                 if (success && mSolveListener != null) {
+                    // TODO success时保存入统计记录
                     mSolveListener.onSolved();
                 }
             }
@@ -364,7 +341,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     @Override
     public void onInflateAnimProgress(int value) {
-        Log.e("jlx", "onInflateAnimProgress:" +value);
         mAnimProgress = value;
         invalidate();
     }

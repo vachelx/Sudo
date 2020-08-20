@@ -45,8 +45,8 @@ public class TimerView extends TextView {
     }
 
     public void pauseTimer() {
-        mHandler.removeCallbacksAndMessages(null);
         mOffsetTime += System.currentTimeMillis() - mStartTime;
+        stopTimer();
     }
 
     public void stopTimer() {
@@ -60,7 +60,7 @@ public class TimerView extends TextView {
         int minute = (int) (offsetTime / 60 % 60);
         int second = (int) (offsetTime % 60);
         StringBuilder text = new StringBuilder();
-        if (hour > 1) {
+        if (hour > 0) {
             text.append(hour).append(":");
         }
         if (minute < 10) {
@@ -93,8 +93,8 @@ public class TimerView extends TextView {
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        mHandler.removeCallbacksAndMessages(null);
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        stopTimer();
     }
 }

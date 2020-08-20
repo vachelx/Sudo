@@ -7,16 +7,27 @@ import java.util.TreeSet;
 
 public class Arithmetic {
     public static Integer[][] randomSudo() {
-        Integer[][] sudo = new Integer[9][9];
+        Integer[][] sudo;
         TreeSet<Integer> remainingNumbers = new TreeSet<>();
         for (int n = 1; n <= 9; n++) {
             remainingNumbers.add(n);
         }
 
         Random random = new Random();
+        do {
+            sudo = new Integer[9][9];
+        } while (!performTraverse(sudo, remainingNumbers, random));
 
+        return sudo;
+    }
+
+    private static boolean performTraverse(Integer[][] sudo, TreeSet<Integer> remainingNumbers, Random random) {
+        long start = System.currentTimeMillis();
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; ) {
+                if (System.currentTimeMillis() - start > 30) {
+                    return false;
+                }
                 TreeSet<Integer> cellRemainNumbers = new TreeSet<>(remainingNumbers);
                 for (int x = 0; x < j; x++) {
                     if (sudo[i][x] != null) {
@@ -53,7 +64,7 @@ public class Arithmetic {
                 }
             }
         }
-        return sudo;
+        return true;
     }
 
     public static Integer[][] getExamSudo(int type){
@@ -82,18 +93,6 @@ public class Arithmetic {
             }
         }
 
-        // 结果不唯一时，减少一个空白格
-//        while (!checkSolutionSole(topicSudo, sudo)) {
-//            int row;
-//            int column;
-//            do {
-//                int randomNumber = random.nextInt(81);
-//                row = randomNumber / 9;
-//                column = randomNumber % 9;
-//            } while (topicSudo[row][column] != 0);
-//            topicSudo[row][column] = sudo[row][column];
-//        }
-
         return topicSudo;
     }
 
@@ -108,101 +107,6 @@ public class Arithmetic {
             return 55; // 专家
         }
     }
-
-    private static boolean checkSolutionSole(Integer[][] sudo, Integer[][] targetSudo) {
-        int randomCount = 3;
-        while (randomCount != 0) {
-            Integer[][] randomSolution = getRandomSolution(copySudo(sudo));
-            boolean equally = checkSudoEqually(randomSolution, targetSudo);
-            if (!equally) {
-                return false;
-            }
-            randomCount--;
-        }
-        return true;
-    }
-
-    static class MarkKnife{
-        int markI;
-        int markJ;
-        List<Integer> markRemaining;
-
-        MarkKnife(int i, int j, TreeSet<Integer> mark){
-            markI = i;
-            markJ = j;
-            markRemaining = new ArrayList<>(mark);
-        }
-    }
-
-    private static Integer[][] getRandomSolution(Integer[][] sudo){
-        Integer[][] sourceSudo = copySudo(sudo);
-        Random random = new Random();
-
-        MarkKnife markKnife = getMarkKnife(sourceSudo);
-        if (markKnife == null){
-
-        }
-        return sudo;
-    }
-
-    private static MarkKnife getMarkKnife(Integer[][] sudo){
-        TreeSet<Integer> remainingNumbers = new TreeSet<>();
-        for (int n = 1; n <= 9; n++) {
-            remainingNumbers.add(n);
-        }
-
-        TreeSet<Integer>[][] cellRemainNumbers = new TreeSet[9][9];
-        for (int c = 0; c < 9; c++) {
-            for (int k = 0; k < 9; k++) {
-                cellRemainNumbers[c][k] = new TreeSet<>(remainingNumbers);
-            }
-        }
-
-        int markI = -1;
-        int markJ = -1;
-        int minSize = 10;
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (sudo[i][j] != 0){
-                    continue;
-                }
-                for (int x = 0; x < 9; x++) {
-                    if (sudo[i][x] != 0) {
-                        cellRemainNumbers[i][j].remove(sudo[i][x]);
-                    }
-                }
-                for (int y = 0; y < 9; y++) {
-                    if (sudo[y][j] != 0) {
-                        cellRemainNumbers[i][j].remove(sudo[y][j]);
-                    }
-                }
-                int currentRow = i / 3;
-                int currentColumn = j / 3;
-                for (int rowX = currentRow * 3; rowX < currentRow * 3 + 3; rowX++) {
-                    for (int columnY = currentColumn * 3; columnY < currentColumn * 3 + 3; columnY++) {
-                        if (sudo[rowX][columnY] != 0) {
-                            cellRemainNumbers[i][j].remove(sudo[rowX][columnY]);
-                        }
-                    }
-                }
-
-                int size = cellRemainNumbers[i][j].size();
-                if (size==0){
-                    return null;
-                } else if (cellRemainNumbers[i][j].size() == 1) {
-                    List<Integer> lst = new ArrayList<>(cellRemainNumbers[i][j]);
-                    sudo[i][j] = lst.get(0);
-                } else if (cellRemainNumbers[i][j].size() < minSize){
-                    minSize=cellRemainNumbers[i][j].size();
-                    markI = i;
-                    markJ = j;
-                }
-            }
-        }
-        // markI为-1处理
-        return new MarkKnife(markI, markJ, cellRemainNumbers[markI][markJ]);
-    }
-
 
     public static boolean checkSudoEqually(Integer[][] sudo, Integer[][] targetSudo) {
         for (int i = 0; i < 9; i++) {
