@@ -2,7 +2,7 @@ package com.vachel.sudo.presenter;
 
 import android.animation.ValueAnimator;
 
-import com.vachel.sudo.utils.SudoUtils;
+import com.vachel.sudo.utils.Utils;
 
 import java.util.Random;
 
@@ -19,7 +19,7 @@ public class BoardPresenter {
     // 单元格分割线
     public float[] getInnerLines(float cellWidth) {
         if (mInnerLines == null) {
-            mInnerLines = SudoUtils.getInnerLines(cellWidth);
+            mInnerLines = Utils.getInnerLines(cellWidth);
         }
         return mInnerLines;
     }

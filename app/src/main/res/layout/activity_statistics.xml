@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/ave_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="总共完成了100关，平均耗时 15分26秒"/>
+
+    <TextView
+        android:id="@+id/fast_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="最快记录：3m19s"/>
+
+    <TextView
+        android:id="@+id/last_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="上一次闯关时间为："/>
+
+</LinearLayout>

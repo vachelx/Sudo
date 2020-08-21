@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import com.vachel.sudo.bean.CellHistoryBean;
 import com.vachel.sudo.presenter.BoardPresenter;
 import com.vachel.sudo.utils.Arithmetic;
-import com.vachel.sudo.utils.SudoUtils;
+import com.vachel.sudo.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -196,7 +196,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 mSelectValue = value;
                 invalidate();
             }
-            if (SudoUtils.checkInputFinish(mTmpData)) {
+            if (Utils.checkInputFinish(mTmpData)) {
                 boolean success = Arithmetic.checkResult(mTmpData);
                 Toast.makeText(getContext(), success ? "恭喜你！完成了这一关！5s后进入下一关！" : "还有错误喔！", Toast.LENGTH_SHORT).show();
                 if (success && mSolveListener != null) {

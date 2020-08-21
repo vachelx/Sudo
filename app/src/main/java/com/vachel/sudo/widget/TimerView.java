@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.vachel.sudo.utils.Utils;
+
 import java.lang.ref.WeakReference;
 
 
@@ -44,34 +46,21 @@ public class TimerView extends TextView {
         mHandler.sendEmptyMessage(0);
     }
 
+    // 返回
     public void pauseTimer() {
-        mOffsetTime += System.currentTimeMillis() - mStartTime;
         stopTimer();
     }
 
-    public void stopTimer() {
+    public long stopTimer() {
         mHandler.removeCallbacksAndMessages(null);
+        mOffsetTime += System.currentTimeMillis() - mStartTime;
+        return mOffsetTime;
     }
 
     private void updateTime() {
         long currentTime = System.currentTimeMillis();
-        long offsetTime = (currentTime - mStartTime + mOffsetTime) / 1000;
-        int hour = (int) (offsetTime / 60 / 60);
-        int minute = (int) (offsetTime / 60 % 60);
-        int second = (int) (offsetTime % 60);
-        StringBuilder text = new StringBuilder();
-        if (hour > 0) {
-            text.append(hour).append(":");
-        }
-        if (minute < 10) {
-            text.append(0);
-        }
-        text.append(minute).append(":");
-        if (second < 10) {
-            text.append(0);
-        }
-        text.append(second);
-        setText(text.toString());
+        long offsetTime = currentTime - mStartTime + mOffsetTime;
+        setText(Utils.parseTakeTime(offsetTime, 0));
     }
 
     static class TimerHandler extends Handler {

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 29
@@ -17,6 +18,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    greendao{
+        schemaVersion 1 //数据库的版本
+        daoPackage 'com.vachel.sudo.dao'//greendao 自动生成的辅助类
+        targetGenDir 'src/main/java'//固定目录
+    }
 }
 
 dependencies {
@@ -28,8 +35,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    api 'io.reactivex.rxjava2:rxjava:2.2.1'
-    api 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    api 'com.uber.autodispose:autodispose-android-archcomponents:0.8.0'
-    api 'com.uber.autodispose:autodispose-android:0.8.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.uber.autodispose:autodispose-android-archcomponents:0.8.0'
+    implementation 'com.uber.autodispose:autodispose-android:0.8.0'
+
+    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'org.simple:androideventbus:1.0.5.1'
 }

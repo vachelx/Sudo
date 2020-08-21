@@ -10,7 +10,13 @@ import androidx.lifecycle.Lifecycle;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
+import com.vachel.sudo.dao.Examination;
+import com.vachel.sudo.manager.ExamDataManager;
+import com.vachel.sudo.manager.RecordDataManager;
+import com.vachel.sudo.presenter.SudoPresenter;
 import com.vachel.sudo.utils.Arithmetic;
+import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.InputLayout;
 import com.vachel.sudo.widget.SudoBoard;
 import com.vachel.sudo.widget.TimerView;
@@ -27,6 +33,9 @@ public class SudoActivity extends BaseActivity implements SudoBoard.ISolveListen
     private boolean hasInit = false;
     private SudoBoard mSudoView;
     private Handler mHandler;
+    private SudoPresenter mPresenter;
+    private int[] mCruxKey = new int[4];
+    private Integer[][] mExamSudo;
 
     @Override
     int getLayoutId() {
@@ -36,8 +45,9 @@ public class SudoActivity extends BaseActivity implements SudoBoard.ISolveListen
     @Override
     void init() {
         mHandler = new Handler();
+        mPresenter = new SudoPresenter();
         Intent intent = getIntent();
-        final int mode = intent.getIntExtra("mode", 0);
+        mCruxKey = intent.getIntArrayExtra(Constants.KEY_EXAM);
         mSudoView = findViewById(R.id.sudo_view);
         InputLayout inputView = findViewById(R.id.input_layout);
         mTimer = findViewById(R.id.timer);
@@ -46,8 +56,15 @@ public class SudoActivity extends BaseActivity implements SudoBoard.ISolveListen
         Observable.create(new ObservableOnSubscribe<Integer[][]>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Integer[][]> emitter) {
-                Integer[][] examSudo = Arithmetic.getExamSudo(mode);
-                emitter.onNext(examSudo);
+                if (mCruxKey[Constants.MODE] == 0) { // 随机模式
+                    // 随机模式随机生成题目后才拼接key。
+                    mCruxKey[Constants.INDEX] = RecordDataManager.getInstance().getRecordSizeByClassify(0, mCruxKey[Constants.DIFFICULTY]);
+                    mExamSudo = Arithmetic.getExamSudo(mCruxKey[Constants.DIFFICULTY]);
+                } else { // 闯关模式直接从数据库取题目
+                    Examination examination = ExamDataManager.getInstance().getExam(Utils.getExamKey(mCruxKey));
+                    mExamSudo = Utils.parseSudo(examination.getExam());
+                }
+                emitter.onNext(mExamSudo);
                 emitter.onComplete();
             }
         }).subscribeOn(Schedulers.io()).
@@ -86,11 +103,18 @@ public class SudoActivity extends BaseActivity implements SudoBoard.ISolveListen
 
     @Override
     public void onSolved() {
+        long takeTime = mTimer.stopTimer();
+        mPresenter.saveSolvedRecord(mCruxKey, takeTime, System.currentTimeMillis(), mExamSudo);
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 Intent intent = new Intent(SudoActivity.this, SudoActivity.class);
-                intent.putExtra("mode",  getIntent().getIntExtra("mode", 0));
+                int[] nextKey = new int[4];
+                nextKey[0] = mCruxKey[0];
+                nextKey[1] = mCruxKey[1];
+                nextKey[2] = mCruxKey[2];
+                nextKey[3] = mCruxKey[3] + 1;
+                intent.putExtra(Constants.KEY_EXAM, nextKey);
                 startActivity(intent);
                 finish();
             }
