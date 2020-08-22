@@ -12,9 +12,10 @@ import androidx.annotation.Nullable;
 
 import com.vachel.sudo.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-public class InputLayout extends LinearLayout implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class InputLayout extends LinearLayout implements View.OnClickListener {
     private int[] mTextIds = new int[]{
             R.id.text_0,
             R.id.text_1,
@@ -29,6 +30,8 @@ public class InputLayout extends LinearLayout implements View.OnClickListener, C
     };
     private HashMap<Integer, Integer> mList = new HashMap<>();
     private IOnTextClickListener mListener;
+
+    private ArrayList<View> canLockViews = new ArrayList<>();
 
     public InputLayout(Context context) {
         this(context, null);
@@ -47,11 +50,21 @@ public class InputLayout extends LinearLayout implements View.OnClickListener, C
         View rootView = LayoutInflater.from(getContext()).inflate(R.layout.input_layout, this, true);
         for (int i = 0; i < mTextIds.length; i++) {
             mList.put(mTextIds[i], i);
-            rootView.findViewById(mTextIds[i]).setOnClickListener(this);
+            View view = rootView.findViewById(mTextIds[i]);
+            view.setOnClickListener(this);
+            canLockViews.add(view);
         }
-        ((CheckBox)rootView.findViewById(R.id.mark)).setOnCheckedChangeListener(this);
+        View markView = rootView.findViewById(R.id.mark);
+        markView.setOnClickListener(this);
+        canLockViews.add(markView);
         rootView.findViewById(R.id.reset).setOnClickListener(this);
-        rootView.findViewById(R.id.last_step).setOnClickListener(this);
+        View lastStep = rootView.findViewById(R.id.last_step);
+        lastStep.setOnClickListener(this);
+        canLockViews.add(lastStep);
+
+        View saveView = rootView.findViewById(R.id.save);
+        saveView.setOnClickListener(this);
+        canLockViews.add(saveView);
     }
 
     @Override
@@ -67,13 +80,20 @@ public class InputLayout extends LinearLayout implements View.OnClickListener, C
             mListener.onTextClick(value);
         } else if (id == R.id.last_step){
             mListener.onPreStep();
+        } else if(id == R.id.mark){
+            boolean selected = !v.isSelected();
+            v.setSelected(selected);
+            mListener.onMark(selected);
+        } else if (id == R.id.save){
+            mListener.onSave();
         }
 
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        mListener.onMark(isChecked);
+    public void setLock(boolean lock) {
+        for (View view : canLockViews) {
+            view.setClickable(!lock);
+        }
     }
 
     interface IOnTextClickListener {
@@ -84,9 +104,31 @@ public class InputLayout extends LinearLayout implements View.OnClickListener, C
         void onMark(boolean mark);
 
         void onPreStep();
+
+        void onSave();
     }
 
     public void setOnTextClickListener(IOnTextClickListener listener) {
         mListener = listener;
+    }
+
+    public void updateKeyNumberUseCounts(Integer[][] sudo) {
+        int[] counts = new int[9];
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                Integer value = sudo[i][j];
+                if (value != 0) {
+                    counts[value - 1] += 1;
+                }
+            }
+        }
+
+        for (View view : canLockViews) {
+            if (view instanceof KeyTextView && mList.containsKey(view.getId())){
+                Integer value = mList.get(view.getId());
+                ((KeyTextView)view).setCountText(counts[value-1]+"");
+            }
+        }
+
     }
 }

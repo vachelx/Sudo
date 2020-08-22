@@ -1,6 +1,7 @@
 package com.vachel.sudo.utils;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,8 @@ public class ThreadPoolX {
                     int corePoolSize = Runtime.getRuntime().availableProcessors() - 1;
                     int maximumPoolSize = corePoolSize * 2;
                     long keepAliveTime = 15 * 1000;
-                    sThreadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>(), Executors.defaultThreadFactory());
+                    sThreadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+                            new LinkedBlockingDeque<Runnable>(), Executors.defaultThreadFactory());
                 }
             }
         }

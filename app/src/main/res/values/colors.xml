@@ -11,4 +11,93 @@
     <color name="grey">#C2C2C2</color>
     <color name="grey_dark">#525252</color>
 
+    <color name="main_blue">#5F80FF</color>
+    <color name="main_blue_dark">#5E7FFF</color>
+
+    <color name="main_color_red"> #FF6666</color>
+
+    <color name="market_translation_gray">#626262</color>
+    <color name="market_color_kline_line_path">#6182FF</color>
+    <color name="market_color_kline_shade_start">#5574CD</color>
+    <color name="market_color_kline_shade_end">#105574CD</color>
+    <color name="market_color_kline_shade_divide">#605574CD</color>
+    <color name="market_color_high_line">#D9D9D9</color>
+    <color name="market_color_bar_chart_positive">#FF9A9A</color>
+    <color name="market_color_bar_chart_negative"> #A3E1C1</color>
+    <color name="market_color_chart_page_root_bg"> #fff6f8fc</color>
+    <color name="market_color_chart_pull_popup_pressed"> #5F80FF</color>
+
+    <color name="market_color_search_header">@color/text_little_label</color>
+    <color name="market_color_search_clear">#AEB2C2</color>
+    <color name="market_color_search_cancel">@color/text_little_label</color>
+
+    <color name="market_color_chart_bottom_tab">#53627C</color>
+    <color name="market_color_chart_bottom_tab_select">#5E7FFF</color>
+    <color name="market_color_chart_line_average"> #E6E6E6</color>
+
+    <color name="market_color_gains_up"> #FF6666</color>
+    <color name="market_color_gains_down"> #4EC286</color>
+
+
+<!--    <color name="colorPrimary">#3F51B5</color> &lt;!&ndash;应用的主要色调,actionBar默认使用该颜色,Toolbar导航栏的底色&ndash;&gt;-->
+<!--    <color name="colorPrimaryDark">#303F9F</color>&lt;!&ndash;应用的主要暗色调,statusBarColor默认使用该颜色&ndash;&gt;-->
+<!--    <color name="colorAccent">#6687FF</color>&lt;!&ndash;CheckBox,RadioButton,SwitchCompat等一般控件的选中效果默认采用该颜色&ndash;&gt;-->
+
+    <color name="statusBarColor">#3F51B5</color> <!--状态栏颜色,默认使用colorPrimaryDark-->
+    <color name="windowBackground">#fff6f8fc</color><!--窗口背景颜色-->
+    <color name="navigationBarColor">#000000</color><!--底部栏颜色-->
+
+    <color name="colorForeground">#ffe7e9ed</color> <!--应用的前景色,ListView的分割线,switch滑动区默认使用该颜色-->
+    <color name="colorBackground">#303F9F</color><!--应用的背景色,popMenu的背景默认使用该颜色-->
+
+    <color name="colorButtonNormal">#3F51B5</color> <!--默认按钮的背景颜色-->
+    <color name="colorControlActivated">#303F9F</color><!--控件选中时的颜色,默认使用colorAccent-->
+    <color name="colorControlHighlight">#6687FF</color><!--控件按压时的色调-->
+
+    <color name="editTextColor">#23262F</color> <!--默认EditView输入框字体的颜色。-->
+    <color name="textColor">#303F9F</color><!--Button,textView的文字颜色-->
+    <color name="textColorPrimary">#6687FF</color><!--DisableOnly RadioButton checkbox等控件的文字-->
+
+
+    <color name="itemTitleColor">#23262F</color><!--列表的标题文字颜色-->
+    <color name="itemSubTitleColor">#AEB2C2</color><!--列表的副标题文字颜色-->
+
+<!--    <color name="transparent">#00000000</color> &lt;!&ndash;透明&ndash;&gt;-->
+
+
+    <color name="colorControlNormal">#6687FF</color><!--CheckBox,RadioButton,SwitchCompat等默认状态的颜色-->
+
+    <color name="colorSwitchThumbNormal">#6687FF</color><!--switch thumbs 默认状态的颜色. (switch off)-->
+
+    <color name="colorTipsDot">#FF6666</color><!--switch thumbs 默认状态的颜色. (switch off)-->
+
+    <color name="divider">#ffe7e9ed</color>
+
+    <!--for toolbar-->
+    <color name="toolbarBackground">@color/white</color>
+
+    <color name="colorDialogOk">#5E7FFF</color>
+
+    <color name="stroke_color">#18000000</color>
+
+<!--    <color name="white">#FFFFFF</color>-->
+    <color name="white_pressed">#FBFBFB</color>
+    <color name="white_disabled">#CFCECE</color>
+    <color name="highlight">#6687FF</color>
+    <color name="highlight_pressed">#6282F7</color>
+    <color name="highlight_disabled">#92A9FA</color>
+    <color name="highlight_red">#FF6666</color>
+    <color name="highlight_red_pressed">#F76363</color>
+    <color name="highlight_green">#4EC286</color>
+    <color name="highlight_green_pressed">#4ABA80</color>
+
+    <color name="text_primary">#23262F</color>
+    <color name="text_secondary">#626678</color>
+    <color name="text_inverse">#ffffff</color>
+
+    <color name="text_black">#000000</color>
+    <color name="text_highlight">@color/highlight</color>
+    <color name="text_prompt">@color/highlight_red</color>
+    <color name="text_deactive">#AEB2C2</color>
+    <color name="text_little_label">#6F7385</color>
 </resources>

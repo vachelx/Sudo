@@ -41,19 +41,34 @@ public class TimerView extends TextView {
         mHandler = new TimerHandler(this);
     }
 
+    public long getTakeTime() {
+        return mOffsetTime;
+    }
+
     public void startTimer(){
+        if (mHandler == null) {
+            return;
+        }
         mStartTime = System.currentTimeMillis();
         mHandler.sendEmptyMessage(0);
     }
 
     // 返回
     public void pauseTimer() {
-        stopTimer();
+        if (mHandler == null) {
+            return;
+        }
+        mHandler.removeCallbacksAndMessages(null);
+        mOffsetTime += System.currentTimeMillis() - mStartTime;
     }
 
     public long stopTimer() {
+        if (mHandler == null) {
+            return 0;
+        }
         mHandler.removeCallbacksAndMessages(null);
         mOffsetTime += System.currentTimeMillis() - mStartTime;
+        mHandler = null;
         return mOffsetTime;
     }
 
@@ -61,6 +76,12 @@ public class TimerView extends TextView {
         long currentTime = System.currentTimeMillis();
         long offsetTime = currentTime - mStartTime + mOffsetTime;
         setText(Utils.parseTakeTime(offsetTime, 0));
+    }
+
+    public void onResetStart() {
+        mOffsetTime = 0;
+        mHandler = new TimerHandler(this);
+        startTimer();
     }
 
     static class TimerHandler extends Handler {

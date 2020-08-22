@@ -13,8 +13,9 @@ import com.vachel.sudo.utils.Utils;
  */
 public class SudoPresenter {
     public void saveSolvedRecord(int[] cruxKey, long useTime, long completeTime, Integer[][] examSudo) {
+        // TODO 已存在的记录 验证刷新记录后再更新
         String examKey = Utils.getExamKey(cruxKey);
-        Record record = new Record(examKey, useTime, completeTime,cruxKey[Constants.DIFFICULTY], cruxKey[Constants.INDEX]);
+        Record record = new Record(examKey, useTime, completeTime,cruxKey[Constants.DIFFICULTY], cruxKey[Constants.MODE]);
         RecordDataManager.getInstance().addOrUpdateRecord(record);
 
         Examination examination = new Examination(examKey, Utils.sudoToString(examSudo),cruxKey[Constants.DIFFICULTY], cruxKey[Constants.INDEX], 3,

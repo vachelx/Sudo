@@ -76,9 +76,9 @@ public class StatisticsActivity extends BaseActivity {
                     @Override
                     public void accept(AnalyzeResult analyzeResult) {
                         if (analyzeResult.isSuccess()){
-                            aveText.setText( Utils.parseTakeTime(analyzeResult.getAveTake(), 1));
-                            fastText.setText(Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
-                            lastText.setText(Utils.parseDate(analyzeResult.getLastTime()));
+                            aveText.setText( "平均用时："+Utils.parseTakeTime(analyzeResult.getAveTake(), 1)+ "; 闯了"+ mAllRecords.size()+"关");
+                            fastText.setText("最快用时："+Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
+                            lastText.setText("最近一次："+Utils.parseDate(analyzeResult.getLastTime()));
                         }else {
 
                         }

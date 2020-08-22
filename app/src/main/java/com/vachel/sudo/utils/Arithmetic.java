@@ -98,13 +98,17 @@ public class Arithmetic {
 
     private static int getBlankCount(int type) {
         if (type == 0) {
-            return 37; // 容易
+//            return 37; // 容易
+            return 5;
         } else if (type == 1) {
-            return 46; // 中等
+//            return 46; // 中等
+            return 25;
         } else if (type == 2) {
-            return 51; // 困难
+//            return 51; // 困难
+            return 37;
         } else {
-            return 55; // 专家
+            return 42;
+//            return 55; // 专家
         }
     }
 

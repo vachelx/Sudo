@@ -16,4 +16,7 @@ public class Constants {
     public static final int DIFFICULTY = 1;
     public static final int VERSION = 2;
     public static final int INDEX = 3;
+
+    public static final int ERROR_RECT_WIDTH = 15;
+
 }

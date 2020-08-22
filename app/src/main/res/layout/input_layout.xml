@@ -1,110 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <CheckBox
-        android:id="@+id/mark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="标注"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp">
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="1"/>
+            android:layout_weight="1"
+            app:key_text="1" />
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="2"/>
+            android:layout_weight="1"
+            app:key_text="2" />
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="3"/>
+            android:layout_weight="1"
+            app:key_text="3" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_4"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="4"/>
+            android:layout_weight="1"
+            app:key_text="4" />
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="5"/>
+            android:layout_weight="1"
+            app:key_text="5" />
 
-        <Button
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp">
+
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_6"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="6"/>
+            android:layout_weight="1"
+            app:key_text="6" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_7"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="7"/>
+            android:layout_weight="1"
+            app:key_text="7" />
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_8"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="8"/>
+            android:layout_weight="1"
+            app:key_text="8" />
 
-        <Button
+        <com.vachel.sudo.widget.KeyTextView
             android:id="@+id/text_9"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="9"/>
+            android:layout_weight="1"
+            app:key_text="9" />
+
+        <com.vachel.sudo.widget.KeyTextView
+            android:id="@+id/mark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:edit_mark="true"
+            app:key_text="N" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp">
+
+        <com.vachel.sudo.widget.icon.ResetIcon
             android:id="@+id/reset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="重置"/>
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_icon_bg" />
 
-        <Button
+        <com.vachel.sudo.widget.icon.SaveIcon
+            android:id="@+id/save"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_icon_bg" />
+
+        <com.vachel.sudo.widget.icon.UndoIcon
             android:id="@+id/last_step"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="上一步"/>
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_icon_bg" />
 
-        <Button
+        <com.vachel.sudo.widget.icon.ClearView
             android:id="@+id/text_0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="×"/>
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_icon_bg" />
+
     </LinearLayout>
 
 </LinearLayout>

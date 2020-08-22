@@ -3,9 +3,12 @@ package com.vachel.sudo.widget;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.vachel.sudo.R;
 import com.vachel.sudo.bean.CellHistoryBean;
 import com.vachel.sudo.presenter.BoardPresenter;
 import com.vachel.sudo.utils.Arithmetic;
@@ -22,11 +26,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-public class SudoBoard extends View implements InputLayout.IOnTextClickListener, BoardPresenter.IBoardPresenter {
+import static com.vachel.sudo.utils.Constants.ERROR_RECT_WIDTH;
+
+public class SudoBoard extends View implements InputLayout.IOnTextClickListener, BoardPresenter.IAnimCallback {
     private Integer[][] mExamData;
     private Integer[][] mTmpData;
     private TreeSet<Integer>[][] mMarkInfo = new TreeSet[9][9];
     private LinkedList<ArrayList<CellHistoryBean>> mHistoryList = new LinkedList<>();
+    private ArrayList<int[]> mRightStep = new ArrayList<>(); // 记录正确步骤用于做动画
 
     private Paint mBoardPaint;
     private Paint mInnerPaint;
@@ -40,9 +47,14 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private boolean mIsMark;
     private Paint mMarkPaint;
     private float mMarkTextOffsetY;
-    private ISolveListener mSolveListener;
+    private IBoardListener mBoardListener;
     private int mAnimProgress = 200;
     private BoardPresenter mPresenter;
+    private boolean mHasPopComplete;
+    private int mBreathProgress = -1; // 默认值-1；complete前， completeAnim中为大于0；completeAnim完成后为-2
+    private Paint mGradientPaint;
+    private int mColorBlue;
+    private int mColorRed;
 
     public SudoBoard(Context context) {
         this(context, null);
@@ -58,14 +70,17 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     private void init() {
+        Resources resources = getContext().getResources();
+        mColorBlue = resources.getColor(R.color.main_blue_dark);
+        mColorRed = resources.getColor(R.color.main_color_red);
         mBoardPaint = new Paint();
         mBoardPaint.setAntiAlias(true);
-        mBoardPaint.setColor(Color.RED);
+        mBoardPaint.setColor(mColorBlue);
         mBoardPaint.setStrokeWidth(6);
 
         mInnerPaint = new Paint();
         mInnerPaint.setAntiAlias(true);
-        mInnerPaint.setColor(Color.GRAY);
+        mInnerPaint.setColor(Color.LTGRAY);
 
         mBlankBgPaint = new Paint();
         mBlankBgPaint.setAntiAlias(true);
@@ -73,7 +88,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(Color.BLUE);
+        mTextPaint.setColor(mColorBlue);
 
         mMarkPaint = new Paint();
         mMarkPaint.setAntiAlias(true);
@@ -81,6 +96,10 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mMarkPaint.setTextSize(22f);
         Paint.FontMetrics metrics = mMarkPaint.getFontMetrics();
         mMarkTextOffsetY = (metrics.descent - metrics.ascent) / 2 - metrics.descent;
+
+        mGradientPaint = new Paint();
+        mGradientPaint.setAntiAlias(true);
+        mGradientPaint.setStyle(Paint.Style.FILL);
 
         mPresenter = new BoardPresenter(this);
     }
@@ -95,6 +114,13 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mExamData = data;
         mTmpData = Arithmetic.copySudo(mExamData);
         mPresenter.doInflateAnim();
+        updateCounts();
+    }
+
+    private void updateCounts() {
+        if (mBoardListener != null) {
+            mBoardListener.onTextChanged(mTmpData);
+        }
     }
 
     @Override
@@ -106,46 +132,100 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mTmpData != null) {
-            getCellWidth();
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
-                    Integer currentValue = mTmpData[i][j];
-                    if (currentValue != 0) {
-                        resetTextSize(i, j, mAnimProgress);
-                        String text = currentValue.toString();
-                        float offsetX = mTextPaint.measureText(text) / 2;
-                        float centerX = mCellWidth * j + mCellWidth / 2;
-                        float centerY = mCellWidth * i + mCellWidth / 2;
-                        if (currentValue.equals(mSelectValue)) {
-                            if (mTouchI == i && mTouchJ == j) {
-                                canvas.drawRect(mCellWidth * mTouchJ, mCellWidth * mTouchI, mCellWidth * (mTouchJ + 1), mCellWidth * (mTouchI + 1), mBlankBgPaint);
-                            }
-                            canvas.drawCircle(centerX, centerY, (mCellWidth - 20) / 2, mBoardPaint);
+        if (mPresenter.isStartCompleteAnim()) {
+            drawCompleteAnim(canvas);
+        } else if (mTmpData != null) {
+            drawCells(canvas, mTmpData);
+        }
+        canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
+        canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
+        if (mPresenter.getErrorAnimProgress() != 0) {
+            LinearGradient[] gradient = mPresenter.getGradient();
+            mGradientPaint.setShader(gradient[0]);
+            canvas.drawRect(0, 0, ERROR_RECT_WIDTH, getMeasuredHeight(), mGradientPaint);
+            mGradientPaint.setShader(gradient[1]);
+            canvas.drawRect(0, 0, getMeasuredWidth(), ERROR_RECT_WIDTH, mGradientPaint);
+            mGradientPaint.setShader(gradient[2]);
+            canvas.drawRect(getMeasuredWidth() - ERROR_RECT_WIDTH, 0, getMeasuredWidth(), getMeasuredHeight(), mGradientPaint);
+            mGradientPaint.setShader(gradient[3]);
+            canvas.drawRect(0, getMeasuredHeight() - ERROR_RECT_WIDTH, getMeasuredWidth(), getMeasuredHeight(), mGradientPaint);
+        }
+    }
+
+    private void drawCompleteAnim(Canvas canvas) {
+        drawCells(canvas, mExamData);
+        int animIndex = mPresenter.getCurrentAnimIndex();
+        boolean completeAnimEnd = false;
+        if (animIndex >= mRightStep.size()) {
+            animIndex = mRightStep.size() - 1;
+            completeAnimEnd = true;
+        }
+        mTextPaint.setColor(Color.WHITE);
+        float radius = (mCellWidth - 20) / 2;
+        if (mBreathProgress > 0) {
+            int alpha = (int) (mBreathProgress * 1.0f / 100 * 255);
+            mTextPaint.setAlpha(alpha);
+            mTextPaint.setTextSize(70f * mBreathProgress / 100);
+            Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+            mTextOffsetY = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
+            radius = radius * mBreathProgress / 100f;
+            mBoardPaint.setAlpha(alpha);
+        }
+        for (int i = 0; i <= animIndex; i++) {
+            int[] step = mRightStep.get(i);
+            String text = step[2] + "";
+            float offsetX = mTextPaint.measureText(text) / 2;
+            float centerX = mCellWidth * step[1] + mCellWidth / 2;
+            float centerY = mCellWidth * step[0] + mCellWidth / 2;
+            canvas.drawCircle(centerX, centerY, radius, mBoardPaint);
+            canvas.drawText(text, centerX - offsetX, centerY + mTextOffsetY, mTextPaint);
+        }
+        if (completeAnimEnd) {
+            if (mBreathProgress == -1) {
+                mPresenter.doBreathAnim();
+            }
+        } else {
+            mBoardListener.handleNextFrame();
+        }
+    }
+
+    private void drawCells(Canvas canvas, Integer[][] data) {
+        getCellWidth();
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                Integer currentValue = data[i][j];
+                if (currentValue != 0) {
+                    resetTextSize(i, j, mAnimProgress);
+                    String text = currentValue.toString();
+                    float offsetX = mTextPaint.measureText(text) / 2;
+                    float centerX = mCellWidth * j + mCellWidth / 2;
+                    float centerY = mCellWidth * i + mCellWidth / 2;
+                    if (currentValue.equals(mSelectValue)) {
+                        if (mTouchI == i && mTouchJ == j) {
+                            canvas.drawRect(mCellWidth * mTouchJ, mCellWidth * mTouchI, mCellWidth * (mTouchJ + 1), mCellWidth * (mTouchI + 1), mBlankBgPaint);
                         }
-                        mTextPaint.setColor(mExamData[i][j] == 0 ? Color.BLUE : Color.BLACK);
-                        canvas.drawText(text, centerX - offsetX, centerY + mTextOffsetY, mTextPaint);
-                    } else {
-                        if (currentValue.equals(mSelectValue) && i == mTouchI && j == mTouchJ) {
-                            canvas.drawRect(mCellWidth * j, mCellWidth * i, mCellWidth * (j + 1), mCellWidth * (i + 1), mBlankBgPaint);
-                        }
-                        TreeSet<Integer> currentMarks = mMarkInfo[i][j];
-                        if (currentMarks != null && currentMarks.size() > 0) {
-                            float baseX = mCellWidth * j;
-                            float baseY = mCellWidth * i;
-                            for (Integer mark : currentMarks) {
-                                float markTextCenterX = baseX + ((mark - 1) % 3 + 0.5f) * mCellWidth / 3;
-                                float markTextCenterY = baseY + ((mark - 1) / 3 + 0.5f) * mCellWidth / 3;
-                                float offsetX = mMarkPaint.measureText(mark.toString()) / 2;
-                                canvas.drawText(mark.toString(), markTextCenterX - offsetX, markTextCenterY + mMarkTextOffsetY, mMarkPaint);
-                            }
+                        canvas.drawCircle(centerX, centerY, (mCellWidth - 20) / 2, mBoardPaint);
+                    }
+                    mTextPaint.setColor(mExamData[i][j] == 0 ? currentValue.equals(mSelectValue) ? Color.WHITE : mColorBlue : Color.BLACK);
+                    canvas.drawText(text, centerX - offsetX, centerY + mTextOffsetY, mTextPaint);
+                } else {
+                    if (currentValue.equals(mSelectValue) && i == mTouchI && j == mTouchJ) {
+                        canvas.drawRect(mCellWidth * j, mCellWidth * i, mCellWidth * (j + 1), mCellWidth * (i + 1), mBlankBgPaint);
+                    }
+                    TreeSet<Integer> currentMarks = mMarkInfo[i][j];
+                    if (currentMarks != null && currentMarks.size() > 0) {
+                        float baseX = mCellWidth * j;
+                        float baseY = mCellWidth * i;
+                        for (Integer mark : currentMarks) {
+                            float markTextCenterX = baseX + ((mark - 1) % 3 + 0.5f) * mCellWidth / 3;
+                            float markTextCenterY = baseY + ((mark - 1) / 3 + 0.5f) * mCellWidth / 3;
+                            float offsetX = mMarkPaint.measureText(mark.toString()) / 2;
+                            canvas.drawText(mark.toString(), markTextCenterX - offsetX, markTextCenterY + mMarkTextOffsetY, mMarkPaint);
                         }
                     }
                 }
             }
         }
-        canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
-        canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
     }
 
     @Override
@@ -153,6 +233,13 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (mTmpData == null) {
                 return false;
+            }
+            if (mPresenter.isStartCompleteAnim()) {
+                if (mBreathProgress > -2) {
+                    return true;
+                } else {
+                    mPresenter.setStartCompleteAnim(false);
+                }
             }
             float x = event.getX();
             float y = event.getY();
@@ -180,7 +267,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     @Override
     public void onTextClick(Integer value) {
-        if (mTmpData == null || mSelectValue == null) {
+        if (mTmpData == null || mSelectValue == null || mPresenter.isStartCompleteAnim() || mBreathProgress == -2) {
             return;
         }
         if (!mExamData[mTouchI][mTouchJ].equals(0)) {
@@ -198,16 +285,29 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
             }
             if (Utils.checkInputFinish(mTmpData)) {
                 boolean success = Arithmetic.checkResult(mTmpData);
-                Toast.makeText(getContext(), success ? "恭喜你！完成了这一关！5s后进入下一关！" : "还有错误喔！", Toast.LENGTH_SHORT).show();
-                if (success && mSolveListener != null) {
-                    // TODO success时保存入统计记录
-                    mSolveListener.onSolved();
+                if (success) {
+                    startCompleteAnim();
+                    if (mBoardListener != null) {
+                        mBoardListener.onSolved();
+                    }
+                } else {
+                    mPresenter.doErrorAnim(getMeasuredWidth(), getMeasuredHeight(), mColorRed);
+                    Toast.makeText(getContext(), "还有错误喔！", Toast.LENGTH_SHORT).show();
                 }
             }
         } else { // 增减mark标记
             onCellMark(value);
             invalidate();
         }
+        updateCounts();
+    }
+
+    // 填充成功后动画
+    public void startCompleteAnim() {
+        mSelectValue = null;
+        mBreathProgress = -1;
+        mPresenter.prepareStartCompleteAnimData(mRightStep, mTmpData);
+        invalidate();
     }
 
     @Override
@@ -228,10 +328,19 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 mTouchJ = prevEditCell.getY();
                 mSelectValue = mTmpData[mTouchI][mTouchJ];
             } else {
-                resetAll();
+                mSelectValue = null;
+                mTouchI = 0;
+                mTouchJ = 0;
+                mMarkInfo = new TreeSet[9][9];
             }
             invalidate();
+            updateCounts();
         }
+    }
+
+    @Override
+    public void onSave() {
+
     }
 
     private void onCellMark(Integer value) {
@@ -258,6 +367,10 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     private void onValueChanged(Integer value) {
+        if (value != 0) {
+            mRightStep.add(new int[]{mTouchI, mTouchJ, value});
+        }
+
         ArrayList<CellHistoryBean> historyStep = new ArrayList<>();
 
         // 设置值时清空标注
@@ -316,6 +429,16 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mTouchJ = 0;
         mMarkInfo = new TreeSet[9][9];
         mHistoryList.clear();
+
+        mBreathProgress = -1;
+        mHasPopComplete = false;
+        mAnimProgress = 200;
+        mRightStep.clear();
+        mPresenter.setStartCompleteAnim(false);
+        if (mBoardListener != null) {
+            mBoardListener.onReset();
+            mBoardListener.onTextChanged(mTmpData);
+        }
         invalidate();
     }
 
@@ -335,8 +458,8 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mIsMark = mark;
     }
 
-    public void setSolveListener(ISolveListener listener) {
-        mSolveListener = listener;
+    public void setBoardListener(IBoardListener listener) {
+        mBoardListener = listener;
     }
 
     @Override
@@ -345,7 +468,37 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         invalidate();
     }
 
-    public interface ISolveListener {
+    @Override
+    public void onBreathAnimProgress(int value) {
+        mBreathProgress = value;
+        invalidate();
+    }
+
+    @Override
+    public void onBreathAnimEnd() {
+        invalidate();
+        mBreathProgress = -2;
+        // 第一次完成才跳转
+        if (!mHasPopComplete && mBoardListener != null) {
+            mBoardListener.jumpNext();
+            mHasPopComplete = true;
+        }
+    }
+
+    @Override
+    public void onErrorAnimProgress(int value) {
+        invalidate();
+    }
+
+    public interface IBoardListener {
         void onSolved();
+
+        void handleNextFrame();
+
+        void jumpNext();
+
+        void onReset();
+
+        void onTextChanged(Integer[][] sudo);
     }
 }
