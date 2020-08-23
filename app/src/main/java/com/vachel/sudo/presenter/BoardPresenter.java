@@ -158,7 +158,7 @@ public class BoardPresenter {
         anim.start();
     }
 
-    public void doErrorAnim(final int width, final int height, final int startColor) {
+    public void doErrorAnim(final int width, final int height) {
         if (mErrorAnim != null) {
             return;
         }
@@ -168,6 +168,8 @@ public class BoardPresenter {
             public void onAnimationUpdate(ValueAnimator animation) {
                 int progress = (int) animation.getAnimatedValue();
                 mErrorAnimProgress = progress;
+                int alpha = (int) (mErrorAnimProgress / 100f * 255);
+                int startColor = Color.argb(alpha, 255, 102, 102);
                 mGradient[0] = new LinearGradient(0, 0, ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
                 mGradient[1] = new LinearGradient(0, 0, 0, ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
                 mGradient[2] = new LinearGradient(width, 0, width - ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);

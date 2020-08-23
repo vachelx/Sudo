@@ -10,6 +10,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -54,7 +55,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private int mBreathProgress = -1; // 默认值-1；complete前， completeAnim中为大于0；completeAnim完成后为-2
     private Paint mGradientPaint;
     private int mColorBlue;
-    private int mColorRed;
 
     public SudoBoard(Context context) {
         this(context, null);
@@ -72,7 +72,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private void init() {
         Resources resources = getContext().getResources();
         mColorBlue = resources.getColor(R.color.main_blue_dark);
-        mColorRed = resources.getColor(R.color.main_color_red);
         mBoardPaint = new Paint();
         mBoardPaint.setAntiAlias(true);
         mBoardPaint.setColor(mColorBlue);
@@ -140,6 +139,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
         canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
         if (mPresenter.getErrorAnimProgress() != 0) {
+            Log.e("jlx", "progress = "+ mPresenter.getErrorAnimProgress());
             LinearGradient[] gradient = mPresenter.getGradient();
             mGradientPaint.setShader(gradient[0]);
             canvas.drawRect(0, 0, ERROR_RECT_WIDTH, getMeasuredHeight(), mGradientPaint);
@@ -291,7 +291,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                         mBoardListener.onSolved();
                     }
                 } else {
-                    mPresenter.doErrorAnim(getMeasuredWidth(), getMeasuredHeight(), mColorRed);
+                    mPresenter.doErrorAnim(getMeasuredWidth(), getMeasuredHeight());
                     Toast.makeText(getContext(), "还有错误喔！", Toast.LENGTH_SHORT).show();
                 }
             }
