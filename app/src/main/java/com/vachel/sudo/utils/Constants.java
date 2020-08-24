@@ -19,4 +19,9 @@ public class Constants {
 
     public static final int ERROR_RECT_WIDTH = 15;
 
+
+    /* sharePreferences key*/
+    public static final String GAME_MODE= "default_game_mode";
+    public static final String GAME_DIFFICULTY= "default_game_difficulty";
+
 }

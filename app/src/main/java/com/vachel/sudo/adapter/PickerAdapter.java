@@ -16,17 +16,16 @@ import java.util.ArrayList;
  * Created by jianglixuan on 2020/8/24.
  * Describe:
  */
-public class DifficultyAdapter extends PagerAdapter {
+public class PickerAdapter extends PagerAdapter {
     private ArrayList<String> mData;
-    public DifficultyAdapter(){
-        mData = new ArrayList<>();
-        mData.add("简单");
-        mData.add("中等");
-        mData.add("困难");
-        mData.add("专家");
+    IItemClickListener mListener;
+
+    public PickerAdapter(@NonNull ArrayList<String> data, @NonNull IItemClickListener listener) {
+        mData = data;
+        mListener = listener;
     }
 
-    public int getDataCount(){
+    public int getDataCount() {
         return mData.size();
     }
 
@@ -43,12 +42,13 @@ public class DifficultyAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        position %= mData.size();
-        if (position < 0) {
-            position = mData.size() + position;
+        int realPosition = position % mData.size();
+        if (realPosition < 0) {
+            realPosition = mData.size() + realPosition;
         }
-        String text = mData.get(position);
+        String text = mData.get(realPosition);
         TextView textView = new TextView(container.getContext());
+        textView.setOnClickListener(v -> mListener.onItemClick(position - 1));
         textView.setText(text);
         textView.setGravity(Gravity.CENTER);
         container.addView(textView);
@@ -67,7 +67,11 @@ public class DifficultyAdapter extends PagerAdapter {
 
     @Override
     public float getPageWidth(int position) {
-        return 1f/3;
+        return 1f / 3;
+    }
+
+    public interface IItemClickListener {
+        void onItemClick(int position);
     }
 
 }
