@@ -40,6 +40,10 @@ public class DatabaseManager {
         return getDaoSession().getExaminationDao();
     }
 
+    public static ArchiveBeanDao getArchiveBeanDao(){
+        return getDaoSession().getArchiveBeanDao();
+    }
+
     public static void initCreateAllExams() {
         if (PreferencesUtils.getBooleanPreference(MyApplication.getInstance(), "has_create_all_exams", false)) {
             return;

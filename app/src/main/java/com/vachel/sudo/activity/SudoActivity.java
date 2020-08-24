@@ -15,14 +15,16 @@ import androidx.lifecycle.Lifecycle;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
+import com.vachel.sudo.dao.ArchiveBean;
 import com.vachel.sudo.dao.Examination;
+import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.manager.RecordDataManager;
 import com.vachel.sudo.presenter.SudoPresenter;
 import com.vachel.sudo.utils.Arithmetic;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.InnerHandler;
-import com.vachel.sudo.utils.ThreadPoolX;
+import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.InputLayout;
 import com.vachel.sudo.widget.SudoBoard;
@@ -91,6 +93,19 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
                         mTimer.startTimer();
                     }
                 });
+
+        mReplayView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSudoView.startCompleteAnim();
+            }
+        });
+        mNextGameView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goNextGame();
+            }
+        });
     }
 
     @Override
@@ -117,35 +132,46 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     @Override
     public void onSolved() {
         final long takeTime = mTimer.stopTimer();
-        // 保存记录
-        ThreadPoolX.getThreadPool().execute(new Runnable() {
+        Observable.create(new ObservableOnSubscribe<Long>() {
             @Override
-            public void run() {
-                mPresenter.saveSolvedRecord(mCruxKey, takeTime, System.currentTimeMillis(), mExamSudo);
+            public void subscribe(@NonNull ObservableEmitter<Long> emitter) {
+                long result = mPresenter.checkRecord(mCruxKey, takeTime);
+                emitter.onNext(result);
+                if (result == 0 || result == -1) { // 刷新纪录后保存
+                    mPresenter.saveSolvedRecord(mCruxKey, takeTime, System.currentTimeMillis(), mExamSudo);
+                }
+                emitter.onComplete();
             }
-        });
-        // TODO 显示下一关和复盘按钮
+        }).subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.<Long>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long result) {
+                        if (result == -1) {
+                            mTimer.setText("本题新纪录诞生：" + Utils.parseTakeTime(takeTime, 0));
+                        } else if (result == 0) {
+                            mTimer.setText("恭喜您！耗时" + Utils.parseTakeTime(takeTime, 0));
+                        } else if (result > 0) {
+                            mTimer.setText("耗时" + Utils.parseTakeTime(takeTime, 0) + " 本题最快记录为" + Utils.parseTakeTime(result, 0));
+                        }
+                    }
+                });
+
         mReplayView.setVisibility(View.VISIBLE);
-        mReplayView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSudoView.startCompleteAnim();
-            }
-        });
+        mReplayView.setClickable(true);
         mNextGameView.setVisibility(View.VISIBLE);
-        mNextGameView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goNextGame();
-            }
-        });
         mInputView.setLock(true);
 
     }
 
     @Override
-    public void handleNextFrame() {
-        mHandler.sendEmptyMessageDelayed(0, 20);
+    public void handleNextFrame(final int size) {
+        int defaultDelay = 20;
+        if (size < 20) {
+            defaultDelay = 400 / size;
+        }
+        mHandler.sendEmptyMessageDelayed(0, defaultDelay);
     }
 
     @Override
@@ -184,11 +210,35 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     public void onReset() {
         mTimer.onResetStart();
         mInputView.setLock(false);
+        mReplayView.setClickable(false);
     }
 
     @Override
     public void onTextChanged(Integer[][] sudo) {
         mInputView.updateKeyNumberUseCounts(sudo);
+    }
+
+    @Override
+    public void saveArchive(final Integer[][] examData, final Integer[][] tmpData) {
+        final long takeTime = mTimer.getTakeTime();
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<Boolean> emitter) {
+                ArchiveBean archiveBean = new ArchiveBean(Utils.getArchiveKey(mCruxKey),
+                        Utils.sudoToString(examData), Utils.sudoToString(tmpData),takeTime, System.currentTimeMillis(), mCruxKey[0], mCruxKey[1], mCruxKey[3]);
+                ArchiveDataManager.getInstance().addOrUpdateArchive(archiveBean);
+                emitter.onNext(true);
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean result) {
+                        ToastUtil.showShortToast(SudoActivity.this, "存档成功");
+                    }
+                });
     }
 
     @Override

@@ -17,7 +17,6 @@ public abstract class BaseIconView extends View {
     Paint mPaint;
     Path mPath;
     int mPaintWidth = 8;
-    private boolean mIsPressed;
     private int mColorBlue;
 
     public BaseIconView(Context context) {
@@ -46,7 +45,7 @@ public abstract class BaseIconView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mPaint.setColor(mIsPressed || isSelected() ? Color.WHITE : mColorBlue);
+        mPaint.setColor(isPressed() || isSelected() ? Color.WHITE : mColorBlue);
     }
 
     @Override
@@ -55,12 +54,8 @@ public abstract class BaseIconView extends View {
         if (isClickable()) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    mIsPressed = true;
-                    invalidate();
-                    break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-                    mIsPressed = false;
                     invalidate();
                     break;
             }

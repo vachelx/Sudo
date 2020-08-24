@@ -8,9 +8,11 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
+import com.vachel.sudo.dao.ArchiveBean;
 import com.vachel.sudo.dao.Examination;
 import com.vachel.sudo.dao.Record;
 
+import com.vachel.sudo.dao.ArchiveBeanDao;
 import com.vachel.sudo.dao.ExaminationDao;
 import com.vachel.sudo.dao.RecordDao;
 
@@ -23,9 +25,11 @@ import com.vachel.sudo.dao.RecordDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
+    private final DaoConfig archiveBeanDaoConfig;
     private final DaoConfig examinationDaoConfig;
     private final DaoConfig recordDaoConfig;
 
+    private final ArchiveBeanDao archiveBeanDao;
     private final ExaminationDao examinationDao;
     private final RecordDao recordDao;
 
@@ -33,22 +37,32 @@ public class DaoSession extends AbstractDaoSession {
             daoConfigMap) {
         super(db);
 
+        archiveBeanDaoConfig = daoConfigMap.get(ArchiveBeanDao.class).clone();
+        archiveBeanDaoConfig.initIdentityScope(type);
+
         examinationDaoConfig = daoConfigMap.get(ExaminationDao.class).clone();
         examinationDaoConfig.initIdentityScope(type);
 
         recordDaoConfig = daoConfigMap.get(RecordDao.class).clone();
         recordDaoConfig.initIdentityScope(type);
 
+        archiveBeanDao = new ArchiveBeanDao(archiveBeanDaoConfig, this);
         examinationDao = new ExaminationDao(examinationDaoConfig, this);
         recordDao = new RecordDao(recordDaoConfig, this);
 
+        registerDao(ArchiveBean.class, archiveBeanDao);
         registerDao(Examination.class, examinationDao);
         registerDao(Record.class, recordDao);
     }
     
     public void clear() {
+        archiveBeanDaoConfig.clearIdentityScope();
         examinationDaoConfig.clearIdentityScope();
         recordDaoConfig.clearIdentityScope();
+    }
+
+    public ArchiveBeanDao getArchiveBeanDao() {
+        return archiveBeanDao;
     }
 
     public ExaminationDao getExaminationDao() {

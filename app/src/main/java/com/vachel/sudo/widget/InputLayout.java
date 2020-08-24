@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -74,18 +72,18 @@ public class InputLayout extends LinearLayout implements View.OnClickListener {
         }
         int id = v.getId();
         if (id == R.id.reset) {
-            mListener.onReset();
+            mListener.onResetClick();
         } else if (mList.containsKey(id)) {
             Integer value = mList.get(id);
             mListener.onTextClick(value);
         } else if (id == R.id.last_step){
-            mListener.onPreStep();
+            mListener.onPreStepClick();
         } else if(id == R.id.mark){
             boolean selected = !v.isSelected();
             v.setSelected(selected);
-            mListener.onMark(selected);
+            mListener.onMarkClick(selected);
         } else if (id == R.id.save){
-            mListener.onSave();
+            mListener.onSaveClick();
         }
 
     }
@@ -99,13 +97,13 @@ public class InputLayout extends LinearLayout implements View.OnClickListener {
     interface IOnTextClickListener {
         void onTextClick(Integer value);
 
-        void onReset();
+        void onResetClick();
 
-        void onMark(boolean mark);
+        void onMarkClick(boolean mark);
 
-        void onPreStep();
+        void onPreStepClick();
 
-        void onSave();
+        void onSaveClick();
     }
 
     public void setOnTextClickListener(IOnTextClickListener listener) {

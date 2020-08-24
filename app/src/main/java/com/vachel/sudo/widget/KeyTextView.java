@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -27,6 +28,8 @@ public class KeyTextView extends View {
     private int mColorBlue;
     private int mColorGrey;
     private int mColorGreyDark;
+    private RectF mOval;
+    private final int mDiffPadding = 16;
 
     public KeyTextView(Context context) {
         this(context, null);
@@ -50,16 +53,18 @@ public class KeyTextView extends View {
     }
 
     private void init() {
+        mColorBlue = getContext().getResources().getColor(R.color.main_blue);
+        mColorGrey = getContext().getResources().getColor(R.color.grey);
+        mColorGreyDark = getContext().getResources().getColor(R.color.grey_dark);
+
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(100f);
 
         mBgPaint = new Paint();
         mBgPaint.setAntiAlias(true);
-
-        mColorBlue = getContext().getResources().getColor(R.color.main_blue);
-        mColorGrey = getContext().getResources().getColor(R.color.grey);
-        mColorGreyDark = getContext().getResources().getColor(R.color.grey_dark);
+        mBgPaint.setColor(mColorGrey);
+        mBgPaint.setStrokeWidth(1f);
     }
 
     public void setCountText(String count) {
@@ -77,12 +82,18 @@ public class KeyTextView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         int center = getMeasuredWidth() / 2;
-        mBgPaint.setColor(mIsPressed || isSelected() ? mColorGreyDark : mColorGrey);
-        canvas.drawCircle(center, center, (getMeasuredWidth() - 32) / 2, mBgPaint);
+        boolean selected = mIsPressed || isSelected();
+        mBgPaint.setColor(selected ? mColorGreyDark : mColorGrey);
+        if (selected) {
+            mBgPaint.setStyle(Paint.Style.FILL);
+            canvas.drawCircle(center, center, (getMeasuredWidth() - mDiffPadding * 2) / 2, mBgPaint);
+        } else {
+            mBgPaint.setStyle(Paint.Style.STROKE);
+            canvas.drawArc(getOval(getMeasuredWidth(), getMeasuredHeight()), 0, 360, false, mBgPaint);
+        }
 
         float offSetY = getTextOffSetY();
-
-        mTextPaint.setColor(mIsPressed || isSelected() ? Color.WHITE : mColorBlue);
+        mTextPaint.setColor(selected ? Color.WHITE : mColorBlue);
         mTextPaint.setTextSize(mTextSize);
         float keyOffsetX = mTextPaint.measureText(mKetText) / 2;
         canvas.drawText(mKetText, center - keyOffsetX, center + offSetY, mTextPaint);
@@ -105,9 +116,16 @@ public class KeyTextView extends View {
         }
     }
 
+    private RectF getOval(int width, int height) {
+        if (mOval == null) {
+            mOval = new RectF(mDiffPadding, mDiffPadding, width - mDiffPadding, height - mDiffPadding);
+        }
+        return mOval;
+    }
+
     private float getTextOffSetY() {
         if (mTextOffsetY == 0) {
-            mTextSize = (getMeasuredWidth() - 32) * 2f / 3;
+            mTextSize = (getMeasuredWidth() - mDiffPadding * 2) * 2f / 3;
             mTextPaint.setTextSize(mTextSize);
             Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
             mTextOffsetY = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;

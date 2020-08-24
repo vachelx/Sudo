@@ -23,6 +23,7 @@ public class TimerView extends TextView {
     private Handler mHandler;
     private long mStartTime;
     private long mOffsetTime;
+    private long mRealTakeTime;
 
     public TimerView(Context context) {
         this(context, null);
@@ -42,7 +43,7 @@ public class TimerView extends TextView {
     }
 
     public long getTakeTime() {
-        return mOffsetTime;
+        return mRealTakeTime;
     }
 
     public void startTimer(){
@@ -74,8 +75,8 @@ public class TimerView extends TextView {
 
     private void updateTime() {
         long currentTime = System.currentTimeMillis();
-        long offsetTime = currentTime - mStartTime + mOffsetTime;
-        setText(Utils.parseTakeTime(offsetTime, 0));
+        mRealTakeTime = currentTime - mStartTime + mOffsetTime;
+        setText(Utils.parseTakeTime(mRealTakeTime, 0));
     }
 
     public void onResetStart() {

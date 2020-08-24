@@ -8,9 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -21,6 +19,7 @@ import com.vachel.sudo.R;
 import com.vachel.sudo.bean.CellHistoryBean;
 import com.vachel.sudo.presenter.BoardPresenter;
 import com.vachel.sudo.utils.Arithmetic;
+import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 
 import java.util.ArrayList;
@@ -136,10 +135,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         } else if (mTmpData != null) {
             drawCells(canvas, mTmpData);
         }
-        canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
-        canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
         if (mPresenter.getErrorAnimProgress() != 0) {
-            Log.e("jlx", "progress = "+ mPresenter.getErrorAnimProgress());
             LinearGradient[] gradient = mPresenter.getGradient();
             mGradientPaint.setShader(gradient[0]);
             canvas.drawRect(0, 0, ERROR_RECT_WIDTH, getMeasuredHeight(), mGradientPaint);
@@ -150,6 +146,8 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
             mGradientPaint.setShader(gradient[3]);
             canvas.drawRect(0, getMeasuredHeight() - ERROR_RECT_WIDTH, getMeasuredWidth(), getMeasuredHeight(), mGradientPaint);
         }
+        canvas.drawLines(mPresenter.getInnerLines(getCellWidth()), mInnerPaint);
+        canvas.drawLines(mPresenter.getBoardLines(getCellWidth() * 3), mBoardPaint);
     }
 
     private void drawCompleteAnim(Canvas canvas) {
@@ -185,7 +183,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 mPresenter.doBreathAnim();
             }
         } else {
-            mBoardListener.handleNextFrame();
+            mBoardListener.handleNextFrame(mRightStep.size());
         }
     }
 
@@ -292,7 +290,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                     }
                 } else {
                     mPresenter.doErrorAnim(getMeasuredWidth(), getMeasuredHeight());
-                    Toast.makeText(getContext(), "还有错误喔！", Toast.LENGTH_SHORT).show();
+                    ToastUtil.showShortToast(getContext(), "还有错误喔！");
                 }
             }
         } else { // 增减mark标记
@@ -311,7 +309,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     @Override
-    public void onPreStep() {
+    public void onPreStepClick() {
         ArrayList<CellHistoryBean> changes = mHistoryList.pollLast();
         if (changes != null) {
             // 撤销变化
@@ -339,8 +337,18 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     @Override
-    public void onSave() {
+    public void onSaveClick() {
+        if (mExamData == null) {
+            return;
+        }
+        if (Arithmetic.checkSudoEqually(mExamData, mTmpData) && isMarkEmpty()) {
+            ToastUtil.showShortToast(getContext(), "没有可保存的数据");
+            return;
+        }
 
+        if (mBoardListener!=null){
+            mBoardListener.saveArchive(mExamData, mTmpData);
+        }
     }
 
     private void onCellMark(Integer value) {
@@ -399,7 +407,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     @Override
-    public void onReset() {
+    public void onResetClick() {
         if (Arithmetic.checkSudoEqually(mTmpData, mExamData) && isMarkEmpty()) {
             return;
         }
@@ -454,7 +462,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     @Override
-    public void onMark(boolean mark) {
+    public void onMarkClick(boolean mark) {
         mIsMark = mark;
     }
 
@@ -493,12 +501,14 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     public interface IBoardListener {
         void onSolved();
 
-        void handleNextFrame();
+        void handleNextFrame(int size);
 
         void jumpNext();
 
         void onReset();
 
         void onTextChanged(Integer[][] sudo);
+
+        void saveArchive(Integer[][] examData, Integer[][] tmpData);
     }
 }

@@ -13,13 +13,21 @@ import com.vachel.sudo.utils.Utils;
  */
 public class SudoPresenter {
     public void saveSolvedRecord(int[] cruxKey, long useTime, long completeTime, Integer[][] examSudo) {
-        // TODO 已存在的记录 验证刷新记录后再更新
         String examKey = Utils.getExamKey(cruxKey);
-        Record record = new Record(examKey, useTime, completeTime,cruxKey[Constants.DIFFICULTY], cruxKey[Constants.MODE]);
-        RecordDataManager.getInstance().addOrUpdateRecord(record);
-
-        Examination examination = new Examination(examKey, Utils.sudoToString(examSudo),cruxKey[Constants.DIFFICULTY], cruxKey[Constants.INDEX], 3,
+        Record newRecord = new Record(examKey, useTime, completeTime, cruxKey[Constants.DIFFICULTY], cruxKey[Constants.MODE]);
+        RecordDataManager.getInstance().addOrUpdateRecord(newRecord);
+        Examination examination = new Examination(examKey, Utils.sudoToString(examSudo), cruxKey[Constants.DIFFICULTY], cruxKey[Constants.INDEX], 3,
                 useTime, completeTime, cruxKey[Constants.MODE], cruxKey[Constants.VERSION]);
         ExamDataManager.getInstance().addOrUpdateExamination(examination);
+    }
+
+    public long checkRecord(int[] cruxKey, long completeTime) {
+        String examKey = Utils.getExamKey(cruxKey);
+        Record record = RecordDataManager.getInstance().getRecord(examKey);
+        long result = 0; // 0为闯关成功，无历史记录，-1表示刷新本题的记录，大于0表示未刷新记录，返回值即为最好记录
+        if (record != null) {
+            result = completeTime < record.getTakeTime() ? -1 : record.getTakeTime();
+        }
+        return result;
     }
 }

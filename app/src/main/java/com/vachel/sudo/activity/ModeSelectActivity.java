@@ -4,8 +4,13 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import androidx.viewpager.widget.ViewPager;
+
 import com.vachel.sudo.R;
+import com.vachel.sudo.adapter.DifficultyAdapter;
 import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.transformer.ScaleTransformer;
 
 public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
     private int[] mDifficulty = new int[]{
@@ -47,6 +52,28 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         }
 
         findViewById(R.id.statistics).setOnClickListener(this);
+        final ViewPager pickSelect = findViewById(R.id.pick_select);
+        final DifficultyAdapter adapter = new DifficultyAdapter();
+        pickSelect.setOffscreenPageLimit(3);
+        pickSelect.setAdapter(adapter);
+        pickSelect.setCurrentItem(adapter.getDataCount()*2000);
+        pickSelect.setPageTransformer(false, new ScaleTransformer());
+//        pickSelect.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
     }
 
     @Override

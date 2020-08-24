@@ -25,7 +25,7 @@
             vachel:layout_constraintRight_toRightOf="@id/title_container"
             vachel:layout_constraintTop_toTopOf="@id/title_container"
             vachel:layout_constraintBottom_toBottomOf="@id/title_container"
-            android:layout_marginBottom="8dp"
+            android:paddingBottom="10dp"
             android:text="--:--" />
 
         <com.vachel.sudo.widget.icon.RePlayView
@@ -46,6 +46,7 @@
             android:background="@drawable/selector_icon_bg"
             android:textColor="@color/main_blue"
             android:visibility="gone"
+            android:textStyle="bold"
             vachel:layout_constraintRight_toRightOf="parent"
             vachel:layout_constraintLeft_toRightOf="@id/replay"
             vachel:layout_constraintTop_toBottomOf="@id/timer"
