@@ -1,10 +1,13 @@
 package com.vachel.sudo.utils;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeSet;
 
 public class Utils {
     // 检查填写完整度
@@ -67,12 +70,9 @@ public class Utils {
         return cruxKeys[0] + "_" + cruxKeys[1] + "_" + cruxKeys[2] + "_" + cruxKeys[3];
     }
 
-    // 存档的key 随机模式不需要使用version和index进行组合
+    // 存档的key 不需要使用version和index进行组合
     public static String getArchiveKey(int[] cruxKeys) {
-        if (cruxKeys[0] == 0) {
-            return cruxKeys[0] + "_" + cruxKeys[1] + "_" + 0 + "_" + 0;
-        }
-        return cruxKeys[0] + "_" + cruxKeys[1] + "_" + cruxKeys[2] + "_" + cruxKeys[3];
+        return cruxKeys[0] + "_" + cruxKeys[1];
     }
 
     public static int getNextExamIndex(@NonNull String currentExamKey) {
@@ -129,5 +129,40 @@ public class Utils {
     public static String parseDate(long time) {
         Date date = new Date(time);
         return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
+    }
+
+    public static String sudoMarksToString(TreeSet<Integer>[][] marks) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (marks[i][j] != null) {
+                    builder.append(i).append(":").append(j).append(":");
+                    TreeSet<Integer> values = marks[i][j];
+                    for (Integer mark: values) {
+                        builder.append(mark);
+                    }
+                    builder.append(";");
+                }
+            }
+        }
+        return builder.toString();
+    }
+
+    public static TreeSet<Integer>[][] parseMarks(@NonNull String marks) {
+        TreeSet<Integer>[][] result = new TreeSet[9][9];
+        String[] split = marks.split(";");
+        for (String s : split) {
+            if (!TextUtils.isEmpty(s)) {
+                String[] info = s.split(":");
+                if (info.length == 3) {
+                    TreeSet<Integer> mark = new TreeSet<>();
+                    for (int j = 0; j < info[2].length(); j++) {
+                        mark.add(Integer.valueOf(info[2].substring(j, j + 1)));
+                    }
+                    result[Integer.valueOf(info[0])][Integer.valueOf(info[1])] = mark;
+                }
+            }
+        }
+        return result;
     }
 }

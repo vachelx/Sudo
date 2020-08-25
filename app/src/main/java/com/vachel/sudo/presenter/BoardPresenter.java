@@ -71,12 +71,9 @@ public class BoardPresenter {
             }
         }
         ValueAnimator inflateAnim = ValueAnimator.ofInt(0, 200);
-        inflateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int progress = (int) animation.getAnimatedValue();
-                mCallback.onInflateAnimProgress(progress);
-            }
+        inflateAnim.addUpdateListener(animation -> {
+            int progress = (int) animation.getAnimatedValue();
+            mCallback.onInflateAnimProgress(progress);
         });
         inflateAnim.setDuration(600);
         inflateAnim.start();
@@ -140,12 +137,9 @@ public class BoardPresenter {
 
     public void doBreathAnim() {
         ValueAnimator anim = ValueAnimator.ofInt(100, 20, 100);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int progress = (int) animation.getAnimatedValue();
-                mCallback.onBreathAnimProgress(progress);
-            }
+        anim.addUpdateListener(animation -> {
+            int progress = (int) animation.getAnimatedValue();
+            mCallback.onBreathAnimProgress(progress);
         });
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -163,19 +157,16 @@ public class BoardPresenter {
             return;
         }
         mErrorAnim = ValueAnimator.ofInt(0, 100, 0, 100, 0);
-        mErrorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int progress = (int) animation.getAnimatedValue();
-                mErrorAnimProgress = progress;
-                int alpha = (int) (mErrorAnimProgress / 100f * 255);
-                int startColor = Color.argb(alpha, 255, 102, 102);
-                mGradient[0] = new LinearGradient(0, 0, ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
-                mGradient[1] = new LinearGradient(0, 0, 0, ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
-                mGradient[2] = new LinearGradient(width, 0, width - ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
-                mGradient[3] = new LinearGradient(0, height, 0, height - ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
-                mCallback.onErrorAnimProgress(progress);
-            }
+        mErrorAnim.addUpdateListener(animation -> {
+            int progress = (int) animation.getAnimatedValue();
+            mErrorAnimProgress = progress;
+            int alpha = (int) (mErrorAnimProgress / 100f * 255);
+            int startColor = Color.argb(alpha, 255, 102, 102);
+            mGradient[0] = new LinearGradient(0, 0, ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
+            mGradient[1] = new LinearGradient(0, 0, 0, ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
+            mGradient[2] = new LinearGradient(width, 0, width - ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
+            mGradient[3] = new LinearGradient(0, height, 0, height - ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
+            mCallback.onErrorAnimProgress(progress);
         });
         mErrorAnim.setDuration(800);
         mErrorAnim.addListener(new AnimatorListenerAdapter() {

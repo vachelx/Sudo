@@ -15,7 +15,15 @@
     <color name="main_blue_dark">#5E7FFF</color>
 
     <color name="main_color_red"> #FF6666</color>
+    <color name="default_text_color">#525252</color>
+    <color name="default_color_green"> #4EC286</color>
+    <color name="light_green"> #A3E1C1</color>
+    <color name="default_divider_color">#EE000000</color>
 
+
+
+
+    /* ------------------------------*/
     <color name="market_translation_gray">#626262</color>
     <color name="market_color_kline_line_path">#6182FF</color>
     <color name="market_color_kline_shade_start">#5574CD</color>

@@ -19,6 +19,8 @@ public class ArchiveBean {
 
     private String tmp;
 
+    private String mark;
+
     @Property(nameInDb = "TAKE_TIME")
     private long takeTime;
 
@@ -31,12 +33,13 @@ public class ArchiveBean {
 
     private int index;
 
-    @Generated(hash = 948365679)
-    public ArchiveBean(String key, String exam, String tmp, long takeTime,
-            long saveDate, int mode, int difficulty, int index) {
+    @Generated(hash = 172277992)
+    public ArchiveBean(String key, String exam, String tmp, String mark,
+            long takeTime, long saveDate, int mode, int difficulty, int index) {
         this.key = key;
         this.exam = exam;
         this.tmp = tmp;
+        this.mark = mark;
         this.takeTime = takeTime;
         this.saveDate = saveDate;
         this.mode = mode;
@@ -110,5 +113,13 @@ public class ArchiveBean {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public String getMark() {
+        return this.mark;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
     }
 }

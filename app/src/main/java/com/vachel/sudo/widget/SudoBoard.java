@@ -11,14 +11,13 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.vachel.sudo.R;
 import com.vachel.sudo.bean.CellHistoryBean;
 import com.vachel.sudo.presenter.BoardPresenter;
-import com.vachel.sudo.utils.Arithmetic;
+import com.vachel.sudo.engine.Arithmetic;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 
@@ -111,6 +110,14 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     public void initData(@NonNull Integer[][] data) {
         mExamData = data;
         mTmpData = Arithmetic.copySudo(mExamData);
+        mPresenter.doInflateAnim();
+        updateCounts();
+    }
+
+    public void resumeData(Integer[][] data, Integer[][] mResumeTmpSudo, TreeSet<Integer>[][] mResumeMarks) {
+        mExamData = data;
+        mTmpData = mResumeTmpSudo;
+        mMarkInfo = mResumeMarks;
         mPresenter.doInflateAnim();
         updateCounts();
     }
@@ -347,7 +354,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         }
 
         if (mBoardListener!=null){
-            mBoardListener.saveArchive(mExamData, mTmpData);
+            mBoardListener.saveArchive(mExamData, mTmpData, mMarkInfo);
         }
     }
 
@@ -509,6 +516,6 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
         void onTextChanged(Integer[][] sudo);
 
-        void saveArchive(Integer[][] examData, Integer[][] tmpData);
+        void saveArchive(Integer[][] examData, Integer[][] tmpData, TreeSet<Integer>[][] marks);
     }
 }

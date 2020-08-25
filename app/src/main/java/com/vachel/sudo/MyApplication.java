@@ -3,7 +3,7 @@ package com.vachel.sudo;
 import android.app.Application;
 
 import com.vachel.sudo.dao.DatabaseManager;
-import com.vachel.sudo.utils.ThreadPoolX;
+import com.vachel.sudo.engine.ThreadPoolX;
 
 
 /**
@@ -17,12 +17,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
-        ThreadPoolX.getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                DatabaseManager.initGreenDao(sInstance);
-                DatabaseManager.initCreateAllExams();
-            }
+        ThreadPoolX.getThreadPool().execute(() -> {
+            DatabaseManager.initGreenDao(sInstance);
+            DatabaseManager.initCreateAllExams();
         });
     }
 

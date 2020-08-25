@@ -46,6 +46,15 @@ public class TimerView extends TextView {
         return mRealTakeTime;
     }
 
+    public void startTimerWithMillis(long offsetTime) {
+        if (mHandler == null) {
+            return;
+        }
+        mOffsetTime = offsetTime;
+        mStartTime = System.currentTimeMillis();
+        mHandler.sendEmptyMessage(0);
+    }
+
     public void startTimer(){
         if (mHandler == null) {
             return;

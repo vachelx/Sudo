@@ -42,11 +42,12 @@ public class ArchiveDataManager {
         return DatabaseManager.getArchiveBeanDao().loadAll();
     }
 
-    public List<ArchiveBean> getArchivesByDiff(int mode, int difficulty, int index) {
-        if (mode == 0){
-            return DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().list();
-        } else {
-            return DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty), ArchiveBeanDao.Properties.Index.eq(index)).build().list();
-        }
+    public ArchiveBean getArchiveByDiff(int mode, int difficulty) {
+        return DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().unique();
+    }
+
+    public boolean checkArchiveExist(int mode, int difficulty) {
+        List<ArchiveBean> list = DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().list();
+        return list != null && list.size() > 0;
     }
 }

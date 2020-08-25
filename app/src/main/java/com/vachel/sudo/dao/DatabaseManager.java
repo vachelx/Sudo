@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.vachel.sudo.MyApplication;
 import com.vachel.sudo.manager.ExamDataManager;
-import com.vachel.sudo.utils.Arithmetic;
+import com.vachel.sudo.engine.Arithmetic;
 import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
 
@@ -49,7 +49,7 @@ public class DatabaseManager {
             return;
         }
         for (int i = 0; i < 4; i++) {
-            int count = i == 0 ? 36 : i == 1 ? 48 : i == 2 ? 60 : 72;
+            int count = 999;
             for (int j = 0; j < count; j++) {
                 Integer[][] sudo = Arithmetic.getExamSudo(i);
                 String examKey = Utils.getExamKey(1, i, 0, j);

@@ -25,7 +25,7 @@ public class ScaleTransformer implements ViewPager.PageTransformer {
     public ScaleTransformer() {
         Resources resources = MyApplication.getInstance().getResources();
         mSelectColor = resources.getColor(R.color.main_blue);
-        mUnSelectColor = resources.getColor(R.color.black);
+        mUnSelectColor = resources.getColor(R.color.default_text_color);
     }
 
     @Override

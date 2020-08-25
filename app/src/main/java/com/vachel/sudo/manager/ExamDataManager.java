@@ -43,7 +43,7 @@ public class ExamDataManager {
     }
 
     public List<Examination> getExamsByDiff(int mode, int difficulty) {
-        return DatabaseManager.getExaminationDao().queryBuilder().where(ExaminationDao.Properties.Mode.eq(mode), ExaminationDao.Properties.Difficulty.eq(difficulty)).build().list();
+        return DatabaseManager.getExaminationDao().queryBuilder().where(ExaminationDao.Properties.Mode.eq(mode), ExaminationDao.Properties.Difficulty.eq(difficulty)).orderAsc(ExaminationDao.Properties.SortIndex).build().list();
     }
 
 }

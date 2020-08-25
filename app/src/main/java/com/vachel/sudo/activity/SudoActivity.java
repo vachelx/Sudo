@@ -2,14 +2,12 @@ package com.vachel.sudo.activity;
 
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import com.uber.autodispose.AutoDispose;
@@ -21,7 +19,7 @@ import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.manager.RecordDataManager;
 import com.vachel.sudo.presenter.SudoPresenter;
-import com.vachel.sudo.utils.Arithmetic;
+import com.vachel.sudo.engine.Arithmetic;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.InnerHandler;
 import com.vachel.sudo.utils.ToastUtil;
@@ -31,8 +29,9 @@ import com.vachel.sudo.widget.SudoBoard;
 import com.vachel.sudo.widget.TimerView;
 import com.vachel.sudo.widget.icon.RePlayView;
 
+import java.util.TreeSet;
+
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -49,6 +48,10 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     private RePlayView mReplayView;
     private InputLayout mInputView;
     private Button mNextGameView;
+    private boolean mIsResume;
+    private Integer[][] mResumeTmpSudo;
+    private TreeSet<Integer>[][] mResumeMarks;
+    private long mResumeTime;
 
     @Override
     int getLayoutId() {
@@ -61,6 +64,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         mPresenter = new SudoPresenter();
         Intent intent = getIntent();
         mCruxKey = intent.getIntArrayExtra(Constants.KEY_EXAM);
+        mIsResume = intent.getBooleanExtra(Constants.KEY_RESUME, false);
         mSudoView = findViewById(R.id.sudo_view);
         mReplayView = findViewById(R.id.replay);
         mNextGameView = findViewById(R.id.next_game);
@@ -68,44 +72,39 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         mTimer = findViewById(R.id.timer);
         mInputView.setOnTextClickListener(mSudoView);
         mSudoView.setBoardListener(this);
-        Observable.create(new ObservableOnSubscribe<Integer[][]>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<Integer[][]> emitter) {
-                if (mCruxKey[Constants.MODE] == 0) { // 随机模式
-                    // 随机模式随机生成题目后才拼接key。
-                    mCruxKey[Constants.INDEX] = RecordDataManager.getInstance().getRecordSizeByClassify(0, mCruxKey[Constants.DIFFICULTY]);
-                    mExamSudo = Arithmetic.getExamSudo(mCruxKey[Constants.DIFFICULTY]);
-                } else { // 闯关模式直接从数据库取题目
-                    Examination examination = ExamDataManager.getInstance().getExam(Utils.getExamKey(mCruxKey));
-                    mExamSudo = Utils.parseSudo(examination.getExam());
-                }
-                emitter.onNext(mExamSudo);
-                emitter.onComplete();
+        Observable.create((ObservableOnSubscribe<Integer[][]>) emitter -> {
+            if (mIsResume) {
+                ArchiveBean archive = ArchiveDataManager.getInstance().getArchiveByDiff(mCruxKey[0], mCruxKey[1]);
+                mExamSudo = Utils.parseSudo(archive.getExam());
+                mResumeTmpSudo = Utils.parseSudo(archive.getTmp());
+                mResumeMarks = Utils.parseMarks(archive.getMark());
+                mResumeTime = archive.getTakeTime();
+            } else if (mCruxKey[Constants.MODE] == 0) { // 随机模式
+                // 随机模式随机生成题目后才拼接key。
+                mCruxKey[Constants.INDEX] = RecordDataManager.getInstance().getRecordSizeByClassify(0, mCruxKey[Constants.DIFFICULTY]);
+                mExamSudo = Arithmetic.getExamSudo(mCruxKey[Constants.DIFFICULTY]);
+            } else { // 闯关模式直接从数据库取题目
+                Examination examination = ExamDataManager.getInstance().getExam(Utils.getExamKey(mCruxKey));
+                mExamSudo = Utils.parseSudo(examination.getExam());
             }
+            emitter.onNext(mExamSudo);
+            emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
                 .as(AutoDispose.<Integer[][]>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(new Consumer<Integer[][]>() {
-                    @Override
-                    public void accept(Integer[][] sudo) {
+                .subscribe(sudo -> {
+                    if (mIsResume) {
+                        mSudoView.resumeData(sudo, mResumeTmpSudo, mResumeMarks);
+                        mTimer.startTimerWithMillis(mResumeTime);
+                    } else {
                         mSudoView.initData(sudo);
-                        hasInit = true;
                         mTimer.startTimer();
                     }
+                    hasInit = true;
                 });
 
-        mReplayView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSudoView.startCompleteAnim();
-            }
-        });
-        mNextGameView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goNextGame();
-            }
-        });
+        mReplayView.setOnClickListener(v -> mSudoView.startCompleteAnim());
+        mNextGameView.setOnClickListener(v -> goNextGame());
     }
 
     @Override
@@ -132,29 +131,23 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     @Override
     public void onSolved() {
         final long takeTime = mTimer.stopTimer();
-        Observable.create(new ObservableOnSubscribe<Long>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<Long> emitter) {
-                long result = mPresenter.checkRecord(mCruxKey, takeTime);
-                emitter.onNext(result);
-                if (result == 0 || result == -1) { // 刷新纪录后保存
-                    mPresenter.saveSolvedRecord(mCruxKey, takeTime, System.currentTimeMillis(), mExamSudo);
-                }
-                emitter.onComplete();
+        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+            long result = mPresenter.checkRecord(mCruxKey, takeTime);
+            emitter.onNext(result);
+            if (result == 0 || result == -1) { // 刷新纪录后保存
+                mPresenter.saveSolvedRecord(mCruxKey, takeTime, System.currentTimeMillis(), mExamSudo);
             }
+            emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
                 .as(AutoDispose.<Long>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long result) {
-                        if (result == -1) {
-                            mTimer.setText("本题新纪录诞生：" + Utils.parseTakeTime(takeTime, 0));
-                        } else if (result == 0) {
-                            mTimer.setText("恭喜您！耗时" + Utils.parseTakeTime(takeTime, 0));
-                        } else if (result > 0) {
-                            mTimer.setText("耗时" + Utils.parseTakeTime(takeTime, 0) + " 本题最快记录为" + Utils.parseTakeTime(result, 0));
-                        }
+                .subscribe(result -> {
+                    if (result == -1) {
+                        mTimer.setText("本题新纪录诞生：" + Utils.parseTakeTime(takeTime, 0));
+                    } else if (result == 0) {
+                        mTimer.setText("恭喜您！耗时" + Utils.parseTakeTime(takeTime, 0));
+                    } else if (result > 0) {
+                        mTimer.setText("耗时" + Utils.parseTakeTime(takeTime, 0) + " 本题最快记录为" + Utils.parseTakeTime(result, 0));
                     }
                 });
 
@@ -177,19 +170,11 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     @Override
     public void jumpNext() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("恭喜你！用时"+ Utils.parseTakeTime(mTimer.getTakeTime(),0)+"。是否进入下一关？");
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        builder.setTitle("恭喜你！用时" + Utils.parseTakeTime(mTimer.getTakeTime(), 0) + "。是否进入下一关？");
+        builder.setNegativeButton("取消", (dialog, which) -> {
         });
         builder.setCancelable(true);
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                goNextGame();
-            }
-        });
+        builder.setPositiveButton("确认", (dialog, which) -> goNextGame());
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -219,31 +204,24 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     @Override
-    public void saveArchive(final Integer[][] examData, final Integer[][] tmpData) {
+    public void saveArchive(final Integer[][] examData, final Integer[][] tmpData, final TreeSet<Integer>[][] marks) {
         final long takeTime = mTimer.getTakeTime();
-        Observable.create(new ObservableOnSubscribe<Boolean>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<Boolean> emitter) {
-                ArchiveBean archiveBean = new ArchiveBean(Utils.getArchiveKey(mCruxKey),
-                        Utils.sudoToString(examData), Utils.sudoToString(tmpData),takeTime, System.currentTimeMillis(), mCruxKey[0], mCruxKey[1], mCruxKey[3]);
-                ArchiveDataManager.getInstance().addOrUpdateArchive(archiveBean);
-                emitter.onNext(true);
-                emitter.onComplete();
-            }
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            ArchiveBean archiveBean = new ArchiveBean(Utils.getArchiveKey(mCruxKey),
+                    Utils.sudoToString(examData), Utils.sudoToString(tmpData), Utils.sudoMarksToString(marks),
+                    takeTime, System.currentTimeMillis(), mCruxKey[0], mCruxKey[1], mCruxKey[3]);
+            ArchiveDataManager.getInstance().addOrUpdateArchive(archiveBean);
+            emitter.onNext(true);
+            emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
                 .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean result) {
-                        ToastUtil.showShortToast(SudoActivity.this, "存档成功");
-                    }
-                });
+                .subscribe(result -> ToastUtil.showShortToast(SudoActivity.this, "存档成功"));
     }
 
     @Override
     public void handleMessage(Message msg) {
-        if (msg.what == 0){
+        if (msg.what == 0) {
             mSudoView.invalidate();
         }
     }

@@ -17,7 +17,8 @@ public abstract class BaseIconView extends View {
     Paint mPaint;
     Path mPath;
     int mPaintWidth = 8;
-    private int mColorBlue;
+    int mColorBlue;
+    boolean mIsPressed;
 
     public BaseIconView(Context context) {
         this(context, null);
@@ -30,6 +31,11 @@ public abstract class BaseIconView extends View {
     public BaseIconView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+        initExtra(attrs);
+    }
+
+    protected void initExtra(AttributeSet attrs) {
+        // do nothing
     }
 
     protected void init() {
@@ -54,8 +60,12 @@ public abstract class BaseIconView extends View {
         if (isClickable()) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    mIsPressed = true;
+                    invalidate();
+                    break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
+                    mIsPressed = false;
                     invalidate();
                     break;
             }

@@ -1,5 +1,6 @@
 package com.vachel.sudo.adapter;
 
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.vachel.sudo.manager.ThemeManager;
+
 import java.util.ArrayList;
+
+import static java.security.AccessController.getContext;
 
 
 /**
@@ -51,6 +56,8 @@ public class PickerAdapter extends PagerAdapter {
         textView.setOnClickListener(v -> mListener.onItemClick(position - 1));
         textView.setText(text);
         textView.setGravity(Gravity.CENTER);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, ThemeManager.getInstance().getLargeTextSize());
+        textView.setTextColor(ThemeManager.getInstance().getNormalTextColor());
         container.addView(textView);
         return textView;
     }

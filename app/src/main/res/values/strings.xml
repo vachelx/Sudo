@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">数独</string>
+    <string name="app_name">sudo</string>
+    <string name="start_game">NEW GAME</string>
+    <string name="resume_game">RESUME</string>
 </resources>

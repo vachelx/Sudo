@@ -5,9 +5,10 @@ package com.vachel.sudo.utils;
  * Describe:
  */
 public class Constants {
-    public static final String KEY_EXAM= "KEY_EXAM";
+    public static final String KEY_EXAM= "key_exam";
+    public static final String KEY_RESUME= "key_resume";
 
-    public static final String KEY_MODE = "KEY_MODE";
+    public static final String KEY_MODE = "key_mode";
     public static final String KEY_DIFFICULTY = "key_difficulty";
     public static final String KEY_VERSION = "key_version";
     public static final String KEY_INDEX = "key_index";

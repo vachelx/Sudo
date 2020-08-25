@@ -1,6 +1,7 @@
 package com.vachel.sudo.bean;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
@@ -10,7 +11,7 @@ import java.util.TreeSet;
  * Created by jianglixuan on 2020/8/20.
  * Describe:
  */
-public class CellHistoryBean {
+public class CellHistoryBean implements Parcelable {
     private int x;
     private int y;
     private Integer value = 0;
@@ -37,6 +38,35 @@ public class CellHistoryBean {
             value = in.readInt();
         }
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(x);
+        dest.writeInt(y);
+        if (value == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(value);
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<CellHistoryBean> CREATOR = new Creator<CellHistoryBean>() {
+        @Override
+        public CellHistoryBean createFromParcel(Parcel in) {
+            return new CellHistoryBean(in);
+        }
+
+        @Override
+        public CellHistoryBean[] newArray(int size) {
+            return new CellHistoryBean[size];
+        }
+    };
 
     public int getX() {
         return x;
