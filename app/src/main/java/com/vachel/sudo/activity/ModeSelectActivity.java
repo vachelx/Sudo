@@ -27,9 +27,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
-    private int mSelectMode;
     private int mSelectDifficulty;
-    private List<ArchiveBean> mAllArchives;
     private View mResumeView;
 
     @Override
@@ -40,24 +38,25 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     @Override
     void init() {
         mResumeView = findViewById(R.id.resume_game);
-
-        initSelectMode();
         initSelectDifficulty();
-        updateResumeView(mSelectMode, mSelectDifficulty);
-
+        updateResumeView(mSelectDifficulty);
         mResumeView.setOnClickListener(this);
         findViewById(R.id.statistics).setOnClickListener(this);
         findViewById(R.id.start_game).setOnClickListener(this);
+        findViewById(R.id.level_mode).setOnClickListener(this);
     }
 
-    private void updateResumeView(final int mode, final int difficulty) {
+    private void updateResumeView(final int difficulty) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            emitter.onNext(ArchiveDataManager.getInstance().checkArchiveExist(mode, difficulty));
+            emitter.onNext(ArchiveDataManager.getInstance().checkRandomArchiveExist(difficulty));
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
                 .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(ModeSelectActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(result -> mResumeView.setVisibility(result ? View.VISIBLE : View.GONE));
+                .subscribe(result -> {
+                    mResumeView.setClickable(result);
+                    mResumeView.setAlpha(result? 1.0f: 0.3f);
+                });
     }
 
     private void initSelectDifficulty() {
@@ -76,51 +75,27 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             @Override
             public void onSelected(int position) {
                 mSelectDifficulty = position % adapter.getDataCount();
-                updateResumeView(mSelectMode, mSelectDifficulty);
+                updateResumeView(mSelectDifficulty);
             }
         });
-    }
-
-    private void initSelectMode() {
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        String[] items = new String[]{
-                "随机玩法",
-                "解锁玩法"
-        };
-        tabLayout.setItems(items);
-        tabLayout.setOnItemClickListener((view, index) -> {
-            mSelectMode = index;
-            updateResumeView(index, mSelectDifficulty);
-        });
-        mSelectMode = PreferencesUtils.getIntegerPreference(this, Constants.GAME_MODE, 0);
-        tabLayout.setSelectItem(mSelectMode);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.statistics){
+        if (id == R.id.statistics) {
             Intent intent = new Intent(ModeSelectActivity.this, StatisticsActivity.class);
             startActivity(intent);
-        }else if(id == R.id.start_game){
-            if (mSelectMode == 1){
-                Intent intent = new Intent(ModeSelectActivity.this, LevelActivity.class);
-                intent.putExtra(Constants.KEY_DIFFICULTY, mSelectDifficulty);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(ModeSelectActivity.this, SudoActivity.class);
-                int[] nextKey = new int[4];
-                nextKey[1] = mSelectDifficulty;
-                intent.putExtra(Constants.KEY_EXAM, nextKey);
-                startActivity(intent);
-            }
-        } else if (id == R.id.resume_game){
+        } else if (id == R.id.start_game || id == R.id.resume_game) {
             Intent intent = new Intent(ModeSelectActivity.this, SudoActivity.class);
             int[] nextKey = new int[4];
-            nextKey[0] = mSelectMode;
             nextKey[1] = mSelectDifficulty;
             intent.putExtra(Constants.KEY_EXAM, nextKey);
-            intent.putExtra(Constants.KEY_RESUME, true);
+            intent.putExtra(Constants.KEY_RESUME, id == R.id.resume_game);
+            startActivity(intent);
+        } else if (id == R.id.level_mode) {
+            Intent intent = new Intent(ModeSelectActivity.this, LevelActivity.class);
+            intent.putExtra(Constants.KEY_DIFFICULTY, mSelectDifficulty);
             startActivity(intent);
         }
     }

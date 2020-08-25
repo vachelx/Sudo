@@ -13,7 +13,13 @@ import com.vachel.sudo.adapter.LevelAdapter;
 import com.vachel.sudo.dao.Examination;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.EventTag;
+import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.TabLayout;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -36,6 +42,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
 
     @Override
     void init() {
+        EventBus.getDefault().register(this);
         mDifficulty = getIntent().getIntExtra(Constants.KEY_DIFFICULTY, 0);
         final TabLayout tabLayout = findViewById(R.id.diff_tab);
         String[] items = new String[]{
@@ -77,4 +84,42 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
         intent.putExtra(Constants.KEY_EXAM, nextKey);
         startActivity(intent);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscriber(tag = EventTag.EXAM_SOLVED)
+    public void onExamSolved(int[] cruxKey) {
+        // 当前页面的题被解决后刷新解锁进度
+        if (cruxKey[0] == 1 && mDifficulty == cruxKey[1]) {
+            final String examKey = Utils.getExamKey(cruxKey);
+            Observable.create((ObservableOnSubscribe<Examination>) emitter -> {
+                Examination exams = ExamDataManager.getInstance().getExam(examKey);
+                emitter.onNext(exams);
+                emitter.onComplete();
+            }).subscribeOn(Schedulers.io()).
+                    observeOn(AndroidSchedulers.mainThread())
+                    .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(LevelActivity.this, Lifecycle.Event.ON_DESTROY)))
+                    .subscribe(result -> {
+                        RecyclerView.Adapter adapter = mListView.getAdapter();
+                        if (adapter != null) {
+                            ((LevelAdapter) adapter).updateExamination(result);
+                        }
+                    });
+        }
+    }
+
+    @Subscriber(tag = EventTag.SAVED_ARCHIVE)
+    public void onSaveArchive(int[] cruxKey) {
+        if (cruxKey[0] == 1 && mDifficulty == cruxKey[1]) {
+            RecyclerView.Adapter adapter = mListView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
 }

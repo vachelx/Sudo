@@ -19,8 +19,9 @@ import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.manager.RecordDataManager;
 import com.vachel.sudo.presenter.SudoPresenter;
-import com.vachel.sudo.engine.Arithmetic;
+import com.vachel.sudo.engine.Algorithm;
 import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.InnerHandler;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
@@ -29,12 +30,13 @@ import com.vachel.sudo.widget.SudoBoard;
 import com.vachel.sudo.widget.TimerView;
 import com.vachel.sudo.widget.icon.RePlayView;
 
+import org.simple.eventbus.EventBus;
+
 import java.util.TreeSet;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListener, InnerHandler.ILifeCycleMessageHandler {
@@ -82,7 +84,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
             } else if (mCruxKey[Constants.MODE] == 0) { // 随机模式
                 // 随机模式随机生成题目后才拼接key。
                 mCruxKey[Constants.INDEX] = RecordDataManager.getInstance().getRecordSizeByClassify(0, mCruxKey[Constants.DIFFICULTY]);
-                mExamSudo = Arithmetic.getExamSudo(mCruxKey[Constants.DIFFICULTY]);
+                mExamSudo = Algorithm.getExamSudo(mCruxKey[Constants.DIFFICULTY]);
             } else { // 闯关模式直接从数据库取题目
                 Examination examination = ExamDataManager.getInstance().getExam(Utils.getExamKey(mCruxKey));
                 mExamSudo = Utils.parseSudo(examination.getExam());
@@ -211,6 +213,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
                     Utils.sudoToString(examData), Utils.sudoToString(tmpData), Utils.sudoMarksToString(marks),
                     takeTime, System.currentTimeMillis(), mCruxKey[0], mCruxKey[1], mCruxKey[3]);
             ArchiveDataManager.getInstance().addOrUpdateArchive(archiveBean);
+            EventBus.getDefault().post(mCruxKey, EventTag.SAVED_ARCHIVE);
             emitter.onNext(true);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).

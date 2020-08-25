@@ -70,9 +70,12 @@ public class Utils {
         return cruxKeys[0] + "_" + cruxKeys[1] + "_" + cruxKeys[2] + "_" + cruxKeys[3];
     }
 
-    // 存档的key 不需要使用version和index进行组合
+    // 存档的key 随机模式不需要使用version和index进行组合
     public static String getArchiveKey(int[] cruxKeys) {
-        return cruxKeys[0] + "_" + cruxKeys[1];
+        if (cruxKeys[0] == 0) {
+            return cruxKeys[0] + "_" + cruxKeys[1] + "_" + 0 + "_" + 0;
+        }
+        return cruxKeys[0] + "_" + cruxKeys[1] + "_" + cruxKeys[2] + "_" + cruxKeys[3];
     }
 
     public static int getNextExamIndex(@NonNull String currentExamKey) {

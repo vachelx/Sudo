@@ -46,8 +46,14 @@ public class ArchiveDataManager {
         return DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().unique();
     }
 
-    public boolean checkArchiveExist(int mode, int difficulty) {
-        List<ArchiveBean> list = DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(mode), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().list();
+    // 检查随机模式的difficulty下有无存档
+    public boolean checkRandomArchiveExist(int difficulty) {
+        List<ArchiveBean> list = DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Mode.eq(0), ArchiveBeanDao.Properties.Difficulty.eq(difficulty)).build().list();
         return list != null && list.size() > 0;
+    }
+
+    // 用于解锁模式判断有无存档
+    public boolean checkArchiveExist(String key) {
+        return getArchive(key) != null;
     }
 }

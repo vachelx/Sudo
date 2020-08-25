@@ -1,7 +1,6 @@
 package com.vachel.sudo.widget.icon;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -30,6 +29,7 @@ public class LevelItem extends BaseIconView {
     private RectF mOval;
     private int mColorGreen;
     private String mTakeText;
+    private boolean mHasArchive;
 
     public LevelItem(Context context) {
         super(context);
@@ -59,14 +59,29 @@ public class LevelItem extends BaseIconView {
         mBgPaint.setStrokeWidth(1f);
     }
 
-    public void setLevelText(String levelText) {
+    public void resetText(String levelText) {
         mLevelText = levelText;
+        mTakeText = null;
         invalidate();
     }
 
-    public void setText(String levelText, String takeText) {
+    public void resetText(String levelText, String takeText) {
         mLevelText = levelText;
         mTakeText = takeText;
+        invalidate();
+    }
+
+    public void setHasArchive(boolean hasArchive) {
+        mHasArchive = hasArchive;
+        invalidate();
+    }
+
+    public boolean hasNullTakeTime() {
+        return TextUtils.isEmpty(mTakeText);
+    }
+
+    public void updateTakeTime(String takeTime) {
+        mTakeText = takeTime;
         invalidate();
     }
 
@@ -100,12 +115,13 @@ public class LevelItem extends BaseIconView {
 
         if (!TextUtils.isEmpty(mLevelText)) {
             float offSetY = getTextOffSetY();
-            mTextPaint.setColor(isClickable() ? Color.WHITE : mColorBlue);
             float keyOffsetX = mTextPaint.measureText(mLevelText) / 2;
             mTextPaint.setTypeface(Typeface.DEFAULT);
+            mTextPaint.setColor(isClickable() ? mHasArchive ? Color.YELLOW : Color.WHITE : mColorBlue);
             if (!TextUtils.isEmpty(mTakeText)) {
                 canvas.drawText(mLevelText, center - keyOffsetX, height - mDiffPadding * 1.5f, mTextPaint);
                 mTextPaint.setTypeface(Typeface.SERIF);
+                mTextPaint.setColor(isSelected() && mHasArchive ? Color.YELLOW : Color.WHITE);
                 canvas.drawText(mTakeText, center - mTextPaint.measureText(mTakeText) / 2, center + offSetY - mDiffPadding / 2f, mTextPaint);
             } else {
                 canvas.drawText(mLevelText, center - keyOffsetX, center + offSetY, mTextPaint);

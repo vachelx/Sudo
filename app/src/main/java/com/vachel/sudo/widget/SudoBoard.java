@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 import com.vachel.sudo.R;
 import com.vachel.sudo.bean.CellHistoryBean;
 import com.vachel.sudo.presenter.BoardPresenter;
-import com.vachel.sudo.engine.Arithmetic;
+import com.vachel.sudo.engine.Algorithm;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 
@@ -109,7 +109,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     public void initData(@NonNull Integer[][] data) {
         mExamData = data;
-        mTmpData = Arithmetic.copySudo(mExamData);
+        mTmpData = Algorithm.copySudo(mExamData);
         mPresenter.doInflateAnim();
         updateCounts();
     }
@@ -289,7 +289,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 invalidate();
             }
             if (Utils.checkInputFinish(mTmpData)) {
-                boolean success = Arithmetic.checkResult(mTmpData);
+                boolean success = Algorithm.checkResult(mTmpData);
                 if (success) {
                     startCompleteAnim();
                     if (mBoardListener != null) {
@@ -348,7 +348,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         if (mExamData == null) {
             return;
         }
-        if (Arithmetic.checkSudoEqually(mExamData, mTmpData) && isMarkEmpty()) {
+        if (Algorithm.checkSudoEqually(mExamData, mTmpData) && isMarkEmpty()) {
             ToastUtil.showShortToast(getContext(), "没有可保存的数据");
             return;
         }
@@ -415,7 +415,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     @Override
     public void onResetClick() {
-        if (Arithmetic.checkSudoEqually(mTmpData, mExamData) && isMarkEmpty()) {
+        if (Algorithm.checkSudoEqually(mTmpData, mExamData) && isMarkEmpty()) {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -438,7 +438,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     private void resetAll() {
-        mTmpData = Arithmetic.copySudo(mExamData);
+        mTmpData = Algorithm.copySudo(mExamData);
         mSelectValue = null;
         mTouchI = 0;
         mTouchJ = 0;

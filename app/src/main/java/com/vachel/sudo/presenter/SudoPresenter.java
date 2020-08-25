@@ -5,7 +5,10 @@ import com.vachel.sudo.dao.Record;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.manager.RecordDataManager;
 import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.Utils;
+
+import org.simple.eventbus.EventBus;
 
 /**
  * Created by jianglixuan on 2020/8/21.
@@ -19,6 +22,7 @@ public class SudoPresenter {
         Examination examination = new Examination(examKey, Utils.sudoToString(examSudo), cruxKey[Constants.DIFFICULTY], cruxKey[Constants.INDEX], 3,
                 useTime, completeTime, cruxKey[Constants.MODE], cruxKey[Constants.VERSION]);
         ExamDataManager.getInstance().addOrUpdateExamination(examination);
+        EventBus.getDefault().post(cruxKey, EventTag.EXAM_SOLVED);
     }
 
     public long checkRecord(int[] cruxKey, long completeTime) {

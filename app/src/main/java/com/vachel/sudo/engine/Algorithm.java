@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
-public class Arithmetic {
+public class Algorithm {
     public static Integer[][] randomSudo() {
         Integer[][] sudo;
         TreeSet<Integer> remainingNumbers = new TreeSet<>();
