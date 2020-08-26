@@ -1,5 +1,6 @@
 package com.vachel.sudo.widget;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.vachel.sudo.R;
 import com.vachel.sudo.bean.CellHistoryBean;
@@ -291,10 +293,10 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
             if (Utils.checkInputFinish(mTmpData)) {
                 boolean success = Algorithm.checkResult(mTmpData);
                 if (success) {
-                    startCompleteAnim();
                     if (mBoardListener != null) {
                         mBoardListener.onSolved();
                     }
+                    startCompleteAnim();
                 } else {
                     mPresenter.doErrorAnim(getMeasuredWidth(), getMeasuredHeight());
                     ToastUtil.showShortToast(getContext(), "还有错误喔！");
@@ -353,7 +355,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
             return;
         }
 
-        if (mBoardListener!=null){
+        if (mBoardListener != null) {
             mBoardListener.saveArchive(mExamData, mTmpData, mMarkInfo);
         }
     }
@@ -418,23 +420,23 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         if (Algorithm.checkSudoEqually(mTmpData, mExamData) && isMarkEmpty()) {
             return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-        builder.setTitle("确认清除所有输入数据，恢复到初始状态？");
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.setCancelable(true);
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                resetAll();
-            }
-        });
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        new BaseAlertDialog()
+                .initDialog(null, "确认清除所有输入数据，恢复到初始状态？")
+                .setNegativeTextDefault()
+                .setPositiveTextDefault()
+                .setListener(new BaseAlertDialog.IDialogListener() {
+                    @Override
+                    public void onPositiveClick() {
+                        resetAll();
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+
+                    }
+                })
+                .show(((AppCompatActivity)getContext()).getSupportFragmentManager(), "");
     }
 
     private void resetAll() {

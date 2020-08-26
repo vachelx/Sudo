@@ -64,12 +64,12 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
             String take = Utils.parseTakeTime(takeTime, 0);
             levelItem.resetText((position + 1) + "", take);
             levelItem.setClickable(true);
-            levelItem.setOnClickListener(v -> mListener.onItemClick(position));
+            levelItem.setLevelClickListener((v, isDouble) -> mListener.onItemClick(position, isDouble));
             levelItem.setSelected(false);
         } else if (position == 0 || mData.get(position - 1).getTakeTime() > 0) {
             // 当前最新关卡
             levelItem.setClickable(true);
-            levelItem.setOnClickListener(v -> mListener.onItemClick(position));
+            levelItem.setLevelClickListener((v, isDouble) -> mListener.onItemClick(position, isDouble));
             levelItem.setSelected(true);
         } else {
             levelItem.setClickable(false);
@@ -119,7 +119,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
     }
 
     public interface IOnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(int position, boolean isDouble);
     }
 
     static class ArchiveRunnable implements Runnable {

@@ -23,6 +23,7 @@
         <activity
             android:name=".activity.SudoActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <activity

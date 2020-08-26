@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -30,6 +31,8 @@ public class LevelItem extends BaseIconView {
     private int mColorGreen;
     private String mTakeText;
     private boolean mHasArchive;
+    private ILevelClickListener mListener;
+    private Runnable mRunnable;
 
     public LevelItem(Context context) {
         super(context);
@@ -57,8 +60,23 @@ public class LevelItem extends BaseIconView {
         mBgPaint.setAntiAlias(true);
         mBgPaint.setColor(mColorGrey);
         mBgPaint.setStrokeWidth(1f);
+        setOnClickListener(v -> {
+            if (mListener == null) {
+                return;
+            }
+            if (mRunnable != null) {
+                removeCallbacks(mRunnable);
+                mListener.onClick(LevelItem.this, true);
+                mRunnable = null;
+            } else {
+                mRunnable = () -> {
+                    mListener.onClick(LevelItem.this, false);
+                    mRunnable = null;
+                };
+                postDelayed(mRunnable, 500);
+            }
+        });
     }
-
     public void resetText(String levelText) {
         mLevelText = levelText;
         mTakeText = null;
@@ -145,4 +163,13 @@ public class LevelItem extends BaseIconView {
         }
         return mTextOffsetY;
     }
+
+    public interface ILevelClickListener{
+        void onClick(View v, boolean isDouble);
+    }
+
+    public void setLevelClickListener(ILevelClickListener listener){
+        mListener = listener;
+    }
+
 }

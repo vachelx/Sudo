@@ -1,8 +1,6 @@
 package com.vachel.sudo.activity;
 
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.widget.CompoundButton;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -13,11 +11,11 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.LevelAdapter;
 import com.vachel.sudo.dao.Examination;
-import com.vachel.sudo.engine.ThreadPoolX;
 import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.EventTag;
+import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.BaseAlertDialog;
 import com.vachel.sudo.widget.TabLayout;
@@ -32,6 +30,8 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.vachel.sudo.utils.Constants.UN_SHOW_RESUME_ACTION_TIPS;
 
 /**
  * Created by jianglixuan on 2020/8/21.
@@ -81,7 +81,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int position, final boolean isDoubleClick) {
         final int[] nextKey = new int[4];
         nextKey[0] = 1;
         nextKey[1] = mDifficulty;
@@ -95,40 +95,43 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                 .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(LevelActivity.this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(hasArchive -> {
                     if (hasArchive) {
-                        final BaseAlertDialog baseAlertDialog = new BaseAlertDialog();
-                        baseAlertDialog.initDialog("提示", "黄色题号表示有存档记录，双击题号可以直接恢复存档");
-                        baseAlertDialog.setNegativeTextDefault();
-                        baseAlertDialog.setPositiveTextDefault();
-                        baseAlertDialog.setShowCheckBox(true, new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                            }
-                        });
-                        baseAlertDialog.show(this.getSupportFragmentManager(), "");
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(LevelActivity.this);
-//                        builder.setTitle("提示");
-//                        builder.setMessage("黄色题号表示有存档记录，双击题号可以直接恢复存档");
-//                        builder.setNegativeButton("新游戏", (dialog, which) -> {
-//                            startSudoActivity(nextKey, false, true);
-//                        });
-//                        builder.setCancelable(true);
-//                        builder.setPositiveButton("恢复存档", (dialog, which) -> startSudoActivity(nextKey, true, true));
-//                        final AlertDialog alertDialog = builder.create();
-//                        alertDialog.show();
-                    } else {
-                        startSudoActivity(nextKey, false, false);
+                        if (isDoubleClick){
+                            startSudoActivity(nextKey, true);
+                            return;
+                        }
+                        boolean unNeedShowDialog = PreferencesUtils.getBooleanPreference(getApplicationContext(), UN_SHOW_RESUME_ACTION_TIPS, false);
+                        if (!unNeedShowDialog) {
+                            showTipsDialog(nextKey);
+                            return;
+                        }
                     }
+                    if (isDoubleClick){
+                        return;
+                    }
+                    startSudoActivity(nextKey, false);
                 });
     }
 
-    private void startSudoActivity(final int[] nextKey, boolean resume, boolean deleteArchive) {
-        if (deleteArchive) {
-            ThreadPoolX.getThreadPool().execute(() -> {
-                ArchiveDataManager.getInstance().deleteArchive(Utils.getArchiveKey(nextKey));
-                EventBus.getDefault().post(nextKey, EventTag.ON_ARCHIVE_CHANGED);
-            });
-        }
+    private void showTipsDialog(int[] nextKey) {
+        new BaseAlertDialog()
+                .initDialog("提示", "双击题号可读取存档游戏，请选择本次操作是否恢复存档？")
+                .setNegativeText("开始游戏")
+                .setPositiveText("读取存档")
+                .setShowCheckBox("不再提示", (buttonView, isChecked) -> PreferencesUtils.setBooleanPreference(getApplicationContext(), UN_SHOW_RESUME_ACTION_TIPS, isChecked))
+                .setListener(new BaseAlertDialog.IDialogListener() {
+                    @Override
+                    public void onPositiveClick() {
+                        startSudoActivity(nextKey, true);
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+                        startSudoActivity(nextKey, false);
+                    }
+                }).show(getSupportFragmentManager(), "");
+    }
+
+    private void startSudoActivity(final int[] nextKey, boolean resume) {
         Intent intent = new Intent(this, SudoActivity.class);
         intent.putExtra(Constants.KEY_EXAM, nextKey);
         intent.putExtra(Constants.KEY_RESUME, resume);

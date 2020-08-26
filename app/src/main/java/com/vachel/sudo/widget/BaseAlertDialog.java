@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,11 +38,12 @@ public class BaseAlertDialog extends DialogFragment {
     public BaseAlertDialog() {
     }
 
-    public void initDialog(String title, String message) {
+    public BaseAlertDialog initDialog(String title, String message) {
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putString("message", message);
         setArguments(args);
+        return this;
     }
 
     public BaseAlertDialog setPositiveTextDefault(){
@@ -90,10 +90,11 @@ public class BaseAlertDialog extends DialogFragment {
      * 设置显示勾选切换按钮和按钮变换监听 第一个参数为true 第二个不能为空
      * @param onCheckedChangeListener
      */
-    public void setShowCheckBox(String checkBoxText,CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
+    public BaseAlertDialog setShowCheckBox(String checkBoxText,CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
         this.showCheckBox = true;
         mCheckBoxText = checkBoxText;
         this.checkBoxChangeListener = onCheckedChangeListener;
+        return this;
     }
 
     @NonNull
@@ -104,22 +105,18 @@ public class BaseAlertDialog extends DialogFragment {
 
     private Dialog baseAlertDialog(String titleName, String message) {
         final Dialog dialog = new Dialog(getActivity(), R.style.CustomDialog);
-        final View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener == null) {
-                    dialog.dismiss();
-                } else {
-                    if (view.getId() == R.id.sure) {
-                        mListener.onPositiveClick();
-                    } else if (view.getId() == R.id.cancel) {
-                        mListener.onNegativeClick();
-                    }
+        final View.OnClickListener listener = view -> {
+            if (mListener == null) {
+                dialog.dismiss();
+            } else {
+                if (view.getId() == R.id.sure) {
+                    mListener.onPositiveClick();
+                } else if (view.getId() == R.id.cancel) {
+                    mListener.onNegativeClick();
                 }
-                if(mIsAutoDismissAble){
-                    dialog.dismiss();
-                }
-
+            }
+            if(mIsAutoDismissAble){
+                dialog.dismiss();
             }
         };
         DialogInterface.OnKeyListener onKeyListener = new DialogInterface.OnKeyListener() {
@@ -137,42 +134,40 @@ public class BaseAlertDialog extends DialogFragment {
         TextView title = convertView.findViewById(R.id.title);
         TextView content = convertView.findViewById(R.id.content);
         CheckBox checkBox = convertView.findViewById(R.id.check_box);
-        CheckBox checkContent = convertView.findViewById(R.id.check_content);
-        if (titleName == null) {
+        TextView checkContent = convertView.findViewById(R.id.check_content);
+        View checkContainer = convertView.findViewById(R.id.check_container);
+
+        if (!TextUtils.isEmpty(titleName)) {
+            title.setText(titleName);
+            content.setTextColor(getActivity().getResources().getColor(R.color.default_text_color));
+        } else {
             title.setVisibility(View.GONE);
             content.setTextColor(getActivity().getResources().getColor(R.color.main_blue));
-        } else {
-            if (!TextUtils.isEmpty(titleName)) {
-                title.setText(titleName);
-                content.setTextColor(getActivity().getResources().getColor(R.color.default_grey_text_color));
-            } else {
-                title.setVisibility(View.GONE);
-                content.setTextColor(getActivity().getResources().getColor(R.color.main_blue));
-            }
         }
-        if (message == null) {
+        if (TextUtils.isEmpty(message)) {
             content.setVisibility(View.GONE);
         } else {
             content.setText(message);
         }
 
-        if(showCheckBox){
-          checkBox.setVisibility(View.VISIBLE);
-          if(null != checkBoxChangeListener){
-              checkBox.setOnCheckedChangeListener(checkBoxChangeListener);
-          }
-
-        }else{
-            checkBox.setVisibility(View.GONE);
+        if (showCheckBox) {
+            checkContainer.setVisibility(View.VISIBLE);
+            checkBox.setVisibility(View.VISIBLE);
+            if (null != checkBoxChangeListener) {
+                checkBox.setOnCheckedChangeListener(checkBoxChangeListener);
+            }
+            checkContent.setText(mCheckBoxText);
+        } else {
+            checkContainer.setVisibility(View.GONE);
         }
 
-        if (mNegativeText == null) {
+        if (TextUtils.isEmpty(mNegativeText)) {
             cancel.setVisibility(View.GONE);
         } else {
             cancel.setText(mNegativeText);
         }
 
-        if (mPositiveText == null) {
+        if (TextUtils.isEmpty(mPositiveText)) {
             sure.setVisibility(View.GONE);
         } else {
             sure.setText(mPositiveText);
@@ -189,14 +184,6 @@ public class BaseAlertDialog extends DialogFragment {
         cancel.setOnClickListener(listener);
         dialog.setContentView(convertView);
         return dialog;
-    }
-
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        super.onDismiss(dialog);
-        if (null != mListener) {
-            mListener.onDismiss();
-        }
     }
 
     @Override
@@ -229,8 +216,6 @@ public class BaseAlertDialog extends DialogFragment {
         void onPositiveClick();
 
         void onNegativeClick();
-
-        void onDismiss();
 
     }
 }

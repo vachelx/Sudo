@@ -24,5 +24,6 @@ public class Constants {
     /* sharePreferences key*/
     public static final String GAME_MODE= "default_game_mode";
     public static final String GAME_DIFFICULTY= "default_game_difficulty";
+    public static final String UN_SHOW_RESUME_ACTION_TIPS = "show_resume_action_tips";
 
 }

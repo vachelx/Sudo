@@ -25,6 +25,7 @@ import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.InnerHandler;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
+import com.vachel.sudo.widget.BaseAlertDialog;
 import com.vachel.sudo.widget.InputLayout;
 import com.vachel.sudo.widget.SudoBoard;
 import com.vachel.sudo.widget.TimerView;
@@ -171,14 +172,22 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
 
     @Override
     public void jumpNext() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("恭喜你！用时" + Utils.parseTakeTime(mTimer.getTakeTime(), 0) + "。是否进入下一关？");
-        builder.setNegativeButton("取消", (dialog, which) -> {
-        });
-        builder.setCancelable(true);
-        builder.setPositiveButton("确认", (dialog, which) -> goNextGame());
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        new BaseAlertDialog()
+                .initDialog("", "恭喜你！用时" + Utils.parseTakeTime(mTimer.getTakeTime(), 0) + "。是否进入下一关？")
+                .setPositiveTextDefault()
+                .setNegativeTextDefault()
+                .setListener(new BaseAlertDialog.IDialogListener() {
+                    @Override
+                    public void onPositiveClick() {
+                        goNextGame();
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+
+                    }
+                })
+                .show(getSupportFragmentManager(), "");
     }
 
     private void goNextGame() {
@@ -218,8 +227,11 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(result -> ToastUtil.showShortToast(SudoActivity.this, "存档成功"));
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(result -> {
+                    ToastUtil.showShortToast(SudoActivity.this, "存档成功");
+                    finish();
+                });
     }
 
     @Override
