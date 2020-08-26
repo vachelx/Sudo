@@ -3,4 +3,6 @@
     <string name="app_name">数独Lite</string>
     <string name="start_game">开始游戏</string>
     <string name="resume_game">恢复游戏</string>
+    <string name="common_sure">确定</string>
+    <string name="common_cancel">取消</string>
 </resources>

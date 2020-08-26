@@ -93,7 +93,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<Integer[][]>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(sudo -> {
                     if (mIsResume) {
                         mSudoView.resumeData(sudo, mResumeTmpSudo, mResumeMarks);
@@ -142,7 +142,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<Long>autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(SudoActivity.this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(result -> {
                     if (result == -1) {
                         mTimer.setText("本题新纪录诞生：" + Utils.parseTakeTime(takeTime, 0));
@@ -213,7 +213,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
                     Utils.sudoToString(examData), Utils.sudoToString(tmpData), Utils.sudoMarksToString(marks),
                     takeTime, System.currentTimeMillis(), mCruxKey[0], mCruxKey[1], mCruxKey[3]);
             ArchiveDataManager.getInstance().addOrUpdateArchive(archiveBean);
-            EventBus.getDefault().post(mCruxKey, EventTag.SAVED_ARCHIVE);
+            EventBus.getDefault().post(mCruxKey, EventTag.ON_ARCHIVE_CHANGED);
             emitter.onNext(true);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).

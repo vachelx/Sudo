@@ -1,6 +1,8 @@
 package com.vachel.sudo.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.widget.CompoundButton;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -11,14 +13,18 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.LevelAdapter;
 import com.vachel.sudo.dao.Examination;
+import com.vachel.sudo.engine.ThreadPoolX;
+import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.Utils;
+import com.vachel.sudo.widget.BaseAlertDialog;
 import com.vachel.sudo.widget.TabLayout;
 
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
+import org.simple.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -46,7 +52,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
         mDifficulty = getIntent().getIntExtra(Constants.KEY_DIFFICULTY, 0);
         final TabLayout tabLayout = findViewById(R.id.diff_tab);
         String[] items = new String[]{
-                "简单", "中等", "困难","专家"
+                "简单", "中等", "困难", "专家"
         };
         tabLayout.setItems(items);
         tabLayout.setSelectItem(mDifficulty);
@@ -67,21 +73,65 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<List<Examination>>autoDisposable(AndroidLifecycleScopeProvider.from(LevelActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(result ->{
-                    LevelAdapter myRecyclerAdapter = new LevelAdapter(this, this,  result);
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(LevelActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(result -> {
+                    LevelAdapter myRecyclerAdapter = new LevelAdapter(this, this, result);
                     mListView.setAdapter(myRecyclerAdapter);
                 });
     }
 
     @Override
     public void onItemClick(int position) {
-        Intent intent = new Intent(this, SudoActivity.class);
-        int[] nextKey = new int[4];
+        final int[] nextKey = new int[4];
         nextKey[0] = 1;
         nextKey[1] = mDifficulty;
         nextKey[3] = position;
+
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            emitter.onNext(ArchiveDataManager.getInstance().checkArchiveExist(Utils.getArchiveKey(nextKey)));
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(LevelActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(hasArchive -> {
+                    if (hasArchive) {
+                        final BaseAlertDialog baseAlertDialog = new BaseAlertDialog();
+                        baseAlertDialog.initDialog("提示", "黄色题号表示有存档记录，双击题号可以直接恢复存档");
+                        baseAlertDialog.setNegativeTextDefault();
+                        baseAlertDialog.setPositiveTextDefault();
+                        baseAlertDialog.setShowCheckBox(true, new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                            }
+                        });
+                        baseAlertDialog.show(this.getSupportFragmentManager(), "");
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(LevelActivity.this);
+//                        builder.setTitle("提示");
+//                        builder.setMessage("黄色题号表示有存档记录，双击题号可以直接恢复存档");
+//                        builder.setNegativeButton("新游戏", (dialog, which) -> {
+//                            startSudoActivity(nextKey, false, true);
+//                        });
+//                        builder.setCancelable(true);
+//                        builder.setPositiveButton("恢复存档", (dialog, which) -> startSudoActivity(nextKey, true, true));
+//                        final AlertDialog alertDialog = builder.create();
+//                        alertDialog.show();
+                    } else {
+                        startSudoActivity(nextKey, false, false);
+                    }
+                });
+    }
+
+    private void startSudoActivity(final int[] nextKey, boolean resume, boolean deleteArchive) {
+        if (deleteArchive) {
+            ThreadPoolX.getThreadPool().execute(() -> {
+                ArchiveDataManager.getInstance().deleteArchive(Utils.getArchiveKey(nextKey));
+                EventBus.getDefault().post(nextKey, EventTag.ON_ARCHIVE_CHANGED);
+            });
+        }
+        Intent intent = new Intent(this, SudoActivity.class);
         intent.putExtra(Constants.KEY_EXAM, nextKey);
+        intent.putExtra(Constants.KEY_RESUME, resume);
         startActivity(intent);
     }
 
@@ -91,7 +141,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscriber(tag = EventTag.EXAM_SOLVED)
+    @Subscriber(tag = EventTag.EXAM_SOLVED, mode = ThreadMode.MAIN)
     public void onExamSolved(int[] cruxKey) {
         // 当前页面的题被解决后刷新解锁进度
         if (cruxKey[0] == 1 && mDifficulty == cruxKey[1]) {
@@ -112,7 +162,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
         }
     }
 
-    @Subscriber(tag = EventTag.SAVED_ARCHIVE)
+    @Subscriber(tag = EventTag.ON_ARCHIVE_CHANGED, mode = ThreadMode.MAIN)
     public void onSaveArchive(int[] cruxKey) {
         if (cruxKey[0] == 1 && mDifficulty == cruxKey[1]) {
             RecyclerView.Adapter adapter = mListView.getAdapter();

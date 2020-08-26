@@ -19,7 +19,10 @@
     <color name="default_color_green"> #4EC286</color>
     <color name="light_green"> #A3E1C1</color>
     <color name="default_divider_color">#EE000000</color>
+    <color name="default_grey_text_color">#9E9E9E</color>
 
+    <color name="btn_stroke">#fbfbfb</color>
+    <color name="white_item_pressed">#E5E5E5</color>
 
 
 

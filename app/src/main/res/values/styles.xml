@@ -28,4 +28,11 @@
         <item name="android:background">@drawable/selector_icon_bg</item>
     </style>
 
+    <!-- 自定义对话框-->
+    <style name="CustomDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
 </resources>

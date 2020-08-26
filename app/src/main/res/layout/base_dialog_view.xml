@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="@dimen/dialog_width"
+              android:layout_height="match_parent"
+              android:background="@drawable/dialog_bg"
+              android:paddingTop="@dimen/dialog_space"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_space"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="@dimen/dialog_space"
+        android:gravity="left"
+        android:textColor="@color/main_blue"
+        android:textSize="@dimen/dialog_title_text_size"/>
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/check_box"
+        android:layout_marginStart="@dimen/dialog_space"
+        android:layout_marginEnd="@dimen/dialog_space"
+        android:gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:lineSpacingMultiplier="1.1"
+        android:text="hhhhhhhhhhhhhhhhhhhhhh"
+        android:textColor="@color/default_grey_text_color"
+        android:textSize="@dimen/dialog_title_text_size"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_space"
+        android:layout_marginEnd="@dimen/dialog_space"
+        android:layout_marginBottom="15dp">
+        <CheckBox
+            android:id="@+id/check_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
+            android:background="@drawable/grey_checkbox_selector"
+            android:button="@null"
+            android:visibility="visible"/>
+        <TextView
+            android:id="@+id/check_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/check_box"
+            android:gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:lineSpacingMultiplier="1.1"
+            android:text="hhhhhhhhhhhhhhhhhhhhhh"
+            android:textColor="@color/default_grey_text_color"
+            android:textSize="@dimen/dialog_title_text_size"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sure"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/dialog_btn_selector"
+            android:gravity="center"
+            android:paddingStart="@dimen/default_padding"
+            android:paddingEnd="@dimen/default_padding"
+            android:text="@string/common_sure"
+            android:textColor="@color/main_blue"
+            android:textSize="@dimen/dialog_title_text_size"/>
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@+id/sure"
+            android:background="@drawable/dialog_btn_selector"
+            android:gravity="center"
+            android:paddingStart="@dimen/default_padding"
+            android:paddingEnd="@dimen/default_padding"
+            android:text="@string/common_cancel"
+            android:textColor="@color/default_grey_text_color"
+            android:textSize="@dimen/dialog_title_text_size"/>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

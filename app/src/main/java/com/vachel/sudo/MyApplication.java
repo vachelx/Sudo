@@ -1,6 +1,7 @@
 package com.vachel.sudo;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.vachel.sudo.dao.DatabaseManager;
 import com.vachel.sudo.engine.ThreadPoolX;
@@ -25,5 +26,9 @@ public class MyApplication extends Application {
 
     public static Application getInstance(){
         return sInstance;
+    }
+
+    public static Context getContext() {
+        return sInstance.getApplicationContext();
     }
 }

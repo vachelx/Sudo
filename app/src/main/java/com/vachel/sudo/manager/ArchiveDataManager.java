@@ -4,6 +4,8 @@ import com.vachel.sudo.dao.ArchiveBean;
 import com.vachel.sudo.dao.ArchiveBeanDao;
 import com.vachel.sudo.dao.DatabaseManager;
 
+import org.simple.eventbus.EventBus;
+
 import java.util.List;
 
 /**
@@ -36,6 +38,10 @@ public class ArchiveDataManager {
 
     public ArchiveBean getArchive(String key) {
         return DatabaseManager.getArchiveBeanDao().queryBuilder().where(ArchiveBeanDao.Properties.Key.eq(key)).build().unique();
+    }
+
+    public void deleteArchive(String key) {
+        DatabaseManager.getArchiveBeanDao().deleteByKey(key);
     }
 
     public List<ArchiveBean> getAllArchives() {
