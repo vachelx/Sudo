@@ -12,8 +12,6 @@ import com.vachel.sudo.dao.Record;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.helper.ScaleTransformer;
 import com.vachel.sudo.manager.RecordDataManager;
-import com.vachel.sudo.utils.Constants;
-import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.record.RecordItem;
 
@@ -46,6 +44,8 @@ public class StatisticsActivity extends BaseActivity {
 
     @Override
     void init() {
+        mSelectMode = 2;
+        mSelectDifficulty = 4;
         initSelectDifficulty();
         initSelectMode();
         mAveTime = findViewById(R.id.ave_time);
@@ -53,7 +53,7 @@ public class StatisticsActivity extends BaseActivity {
         mSlowTime = findViewById(R.id.slow_time);
         mLastTime = findViewById(R.id.last_time);
         mCount = findViewById(R.id.done_count);
-        initData(2, 4);
+        initData(mSelectMode, mSelectDifficulty);
     }
 
     private void initData(final int mode, final int difficulty) {
@@ -129,8 +129,7 @@ public class StatisticsActivity extends BaseActivity {
         data.add("综合");
         final PickerAdapter adapter = new PickerAdapter(data, position -> pickSelect.setCurrentItem(position, true));
         pickSelect.setAdapter(adapter);
-        mSelectMode = PreferencesUtils.getIntegerPreference(this, Constants.GAME_MODE, 0);
-        pickSelect.setCurrentItem(adapter.getDataCount() * 2000 - 1 + mSelectDifficulty);
+        pickSelect.setCurrentItem(adapter.getDataCount() * 2000 - 1 + mSelectMode);
         pickSelect.setPageTransformer(false, new ScaleTransformer());
         pickSelect.addOnPageChangeListener(new PageChangedListener() {
             @Override
@@ -151,7 +150,6 @@ public class StatisticsActivity extends BaseActivity {
         data.add("综合");
         final PickerAdapter adapter = new PickerAdapter(data, position -> pickSelect.setCurrentItem(position, true));
         pickSelect.setAdapter(adapter);
-        mSelectDifficulty = PreferencesUtils.getIntegerPreference(this, Constants.GAME_DIFFICULTY, 0);
         pickSelect.setCurrentItem(adapter.getDataCount() * 2000 - 1 + mSelectDifficulty);
         pickSelect.setPageTransformer(false, new ScaleTransformer());
         pickSelect.addOnPageChangeListener(new PageChangedListener() {

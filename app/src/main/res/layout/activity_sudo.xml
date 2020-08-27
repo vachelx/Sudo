@@ -6,21 +6,25 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    android:padding="8dp"
     tools:context=".activity.SudoActivity">
+
+    <com.vachel.sudo.widget.TrapezoidView
+        android:id="@+id/mode_title"
+        android:layout_width="120dp"
+        android:layout_height="25dp"
+        vachel:trap_orientation_right="false"
+        android:layout_gravity="right"
+        vachel:trap_text="随机模式"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/title_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/title_name"
-            vachel:layout_constraintLeft_toLeftOf="parent"/>
+        android:paddingLeft="@dimen/default_padding"
+        android:paddingRight="@dimen/default_padding"
+        android:paddingBottom="@dimen/default_padding"
+        android:paddingTop="8dp"
+        android:gravity="center">
 
         <com.vachel.sudo.widget.TimerView
             android:id="@+id/timer"
@@ -30,8 +34,7 @@
             vachel:layout_constraintLeft_toLeftOf="@id/title_container"
             vachel:layout_constraintRight_toRightOf="@id/title_container"
             vachel:layout_constraintTop_toTopOf="@id/title_container"
-            vachel:layout_constraintBottom_toBottomOf="@id/title_container"
-            android:paddingBottom="10dp"
+            vachel:layout_constraintBottom_toTopOf="@id/replay"
             android:text="--:--" />
 
         <com.vachel.sudo.widget.icon.RePlayView
@@ -39,11 +42,12 @@
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@drawable/selector_icon_bg"
+            android:layout_marginTop="10dp"
             vachel:layout_constraintHorizontal_chainStyle="spread"
             vachel:layout_constraintRight_toLeftOf="@+id/next_game"
             vachel:layout_constraintTop_toBottomOf="@id/timer"
             vachel:layout_constraintLeft_toLeftOf="parent"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/next_game"
@@ -51,26 +55,27 @@
             android:layout_height="30dp"
             android:background="@drawable/selector_icon_bg"
             android:textColor="@color/main_blue"
-            android:visibility="visible"
+            android:visibility="gone"
             android:textStyle="bold"
+            android:layout_marginTop="10dp"
             vachel:layout_constraintRight_toRightOf="parent"
             vachel:layout_constraintLeft_toRightOf="@id/replay"
             vachel:layout_constraintTop_toBottomOf="@id/timer"
             android:text="下一关"/>
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <com.vachel.sudo.widget.SudoBoard
         android:id="@+id/sudo_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:layout_marginRight="@dimen/default_padding" />
 
     <com.vachel.sudo.widget.InputLayout
         android:id="@+id/input_layout"
         android:layout_marginTop="16dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:layout_marginRight="@dimen/default_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

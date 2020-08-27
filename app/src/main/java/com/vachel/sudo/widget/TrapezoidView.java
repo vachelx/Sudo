@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.vachel.sudo.R;
@@ -44,10 +45,12 @@ public class TrapezoidView extends BaseIconView {
         mPaint.setStyle(Paint.Style.FILL);
         mDarkBlue = getContext().getResources().getColor(R.color.default_text_color);
 
-        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.vachel);
-        mOrientationRight = a.getBoolean(R.styleable.vachel_trap_orientation_right, true);
-        mText = a.getString(R.styleable.vachel_trap_text);
-        a.recycle();
+        if (mText == null) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.vachel);
+            mOrientationRight = a.getBoolean(R.styleable.vachel_trap_orientation_right, true);
+            mText = a.getString(R.styleable.vachel_trap_text);
+            a.recycle();
+        }
 
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
@@ -90,6 +93,11 @@ public class TrapezoidView extends BaseIconView {
                 canvas.drawText(mText, width - 30 - mTextOffsetX, height / 2f + mTextOffsetY, mTextPaint);
             }
         }
+    }
 
+    public void setText(@NonNull CharSequence text){
+        mText = text.toString();
+        mTextOffsetX = mTextPaint.measureText(mText);
+        invalidate();
     }
 }

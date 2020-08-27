@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.lifecycle.Lifecycle;
 
@@ -27,6 +28,7 @@ import com.vachel.sudo.widget.BaseAlertDialog;
 import com.vachel.sudo.widget.InputLayout;
 import com.vachel.sudo.widget.SudoBoard;
 import com.vachel.sudo.widget.TimerView;
+import com.vachel.sudo.widget.TrapezoidView;
 import com.vachel.sudo.widget.icon.RePlayView;
 
 import org.simple.eventbus.EventBus;
@@ -53,6 +55,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     private Integer[][] mResumeTmpSudo;
     private TreeSet<Integer>[][] mResumeMarks;
     private long mResumeTime;
+    private TrapezoidView mTitle;
 
     @Override
     int getLayoutId() {
@@ -66,6 +69,8 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         mIsResume = intent.getBooleanExtra(Constants.KEY_RESUME, false);
         mReplayView.setVisibility(View.GONE);
         mNextGameView.setVisibility(View.GONE);
+
+        mSudoView.resetAll(false);
         initData();
     }
 
@@ -82,8 +87,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     private void initData() {
-
-
+        mTitle.setText(mCruxKey[0] == 0 ? "随机模式" : ("闯关玩法-" + (mCruxKey[3] +1)));
         Observable.create((ObservableOnSubscribe<Integer[][]>) emitter -> {
             if (mIsResume) {
                 ArchiveBean archive = ArchiveDataManager.getInstance().getArchiveByDiff(mCruxKey[0], mCruxKey[1]);
@@ -118,6 +122,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
 
     private void initView() {
         mSudoView = findViewById(R.id.sudo_view);
+        mTitle = findViewById(R.id.mode_title);
         mReplayView = findViewById(R.id.replay);
         mNextGameView = findViewById(R.id.next_game);
         mInputView = findViewById(R.id.input_layout);
@@ -138,7 +143,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     protected void onResume() {
         super.onResume();
         if (hasInit) {
-            mTimer.startTimer();
+            mTimer.resumeTimer();
         }
     }
 
@@ -220,8 +225,10 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     @Override
-    public void onReset() {
-        mTimer.onResetStart();
+    public void onReset(boolean needTimer) {
+        if (needTimer) {
+            mTimer.onResetStart();
+        }
         mInputView.setLock(false);
         mReplayView.setClickable(false);
     }
@@ -256,5 +263,29 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         if (msg.what == 0) {
             mSudoView.invalidate();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mSudoView.hasNoFilledData()){
+            super.onBackPressed();
+            return;
+        }
+        new BaseAlertDialog()
+                .initDialog("", "退出前是否保存当前已填入数据？")
+                .setNegativeText("否")
+                .setPositiveText("是")
+                .setListener(new BaseAlertDialog.IDialogListener() {
+                    @Override
+                    public void onPositiveClick() {
+                        mSudoView.onSaveClick();
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+                        finish();
+                    }
+                })
+                .show(getSupportFragmentManager(), "");
     }
 }

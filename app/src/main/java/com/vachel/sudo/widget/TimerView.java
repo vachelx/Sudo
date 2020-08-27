@@ -76,6 +76,14 @@ public class TimerView extends TextView {
         }
     }
 
+    public void resumeTimer() {
+        if (mState == 2) {
+            mStartTime = System.currentTimeMillis();
+            mHandler.sendEmptyMessage(0);
+            mState = 1;
+        }
+    }
+
     public long stopTimer() {
         if (mState == 1) {
             mHandler.removeCallbacksAndMessages(null);

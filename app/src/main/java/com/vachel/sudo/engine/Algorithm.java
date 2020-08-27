@@ -113,9 +113,12 @@ public class Algorithm {
     }
 
     public static boolean checkSudoEqually(Integer[][] sudo, Integer[][] targetSudo) {
+        if (sudo == null && targetSudo == null) {
+            return true;
+        }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (!sudo[i][j].equals(targetSudo[i][j])){
+                if (!sudo[i][j].equals(targetSudo[i][j])) {
                     return false;
                 }
             }

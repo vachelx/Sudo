@@ -105,9 +105,6 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                             return;
                         }
                     }
-                    if (isDoubleClick){
-                        return;
-                    }
                     startSudoActivity(nextKey, false);
                 });
     }

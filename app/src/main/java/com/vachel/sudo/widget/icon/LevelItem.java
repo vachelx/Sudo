@@ -73,7 +73,7 @@ public class LevelItem extends BaseIconView {
                     mListener.onClick(LevelItem.this, false);
                     mRunnable = null;
                 };
-                postDelayed(mRunnable, 500);
+                postDelayed(mRunnable, 350);
             }
         });
     }

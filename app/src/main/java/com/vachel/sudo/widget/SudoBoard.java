@@ -347,7 +347,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         if (mExamData == null) {
             return;
         }
-        if (Algorithm.checkSudoEqually(mExamData, mTmpData) && isMarkEmpty()) {
+        if (hasNoFilledData()) {
             ToastUtil.showShortToast(getContext(), "没有可保存的数据");
             return;
         }
@@ -355,6 +355,10 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         if (mBoardListener != null) {
             mBoardListener.saveArchive(mExamData, mTmpData, mMarkInfo);
         }
+    }
+
+    public boolean hasNoFilledData() {
+        return Algorithm.checkSudoEqually(mExamData, mTmpData) && isMarkEmpty();
     }
 
     private void onCellMark(Integer value) {
@@ -414,7 +418,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
     @Override
     public void onResetClick() {
-        if (Algorithm.checkSudoEqually(mTmpData, mExamData) && isMarkEmpty()) {
+        if (hasNoFilledData()) {
             return;
         }
 
@@ -425,7 +429,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 .setListener(new BaseAlertDialog.IDialogListener() {
                     @Override
                     public void onPositiveClick() {
-                        resetAll();
+                        resetAll(true);
                     }
 
                     @Override
@@ -436,7 +440,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
                 .show(((AppCompatActivity)getContext()).getSupportFragmentManager(), "");
     }
 
-    private void resetAll() {
+    public void resetAll(boolean needTimer) {
         mTmpData = Algorithm.copySudo(mExamData);
         mSelectValue = null;
         mTouchI = 0;
@@ -450,7 +454,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mRightStep.clear();
         mPresenter.setStartCompleteAnim(false);
         if (mBoardListener != null) {
-            mBoardListener.onReset();
+            mBoardListener.onReset(needTimer);
             mBoardListener.onTextChanged(mTmpData);
         }
         invalidate();
@@ -511,7 +515,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
         void completeExam();
 
-        void onReset();
+        void onReset(boolean needTimer);
 
         void onTextChanged(Integer[][] sudo);
 
