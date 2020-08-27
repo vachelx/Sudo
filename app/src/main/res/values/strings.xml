@@ -4,4 +4,5 @@
     <string name="resume_game">RESUME</string>
     <string name="common_sure">确定</string>
     <string name="common_cancel">取消</string>
+    <string name="default_take_time">-- : -- : --</string>
 </resources>

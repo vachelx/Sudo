@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="vachel">
+        <!--  KeyTextView-->
         <attr name="key_text" format="string"/>
         <attr name="edit_mark" format="boolean"/>
+
+        <!--  TrapezoidView-->
+        <attr name="trap_orientation_right" format="boolean"/>
+        <attr name="trap_text" format="string"/>
+
+        <!--RecordItem-->
+        <attr name="first_text" format="string"/>
+        <attr name="second_text" format="string"/>
     </declare-styleable>
 </resources>

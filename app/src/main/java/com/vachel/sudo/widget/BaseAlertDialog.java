@@ -119,12 +119,7 @@ public class BaseAlertDialog extends DialogFragment {
                 dialog.dismiss();
             }
         };
-        DialogInterface.OnKeyListener onKeyListener = new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
-                return true;
-            }
-        };
+        DialogInterface.OnKeyListener onKeyListener = (arg0, arg1, arg2) -> true;
 
         LayoutInflater mInflater = LayoutInflater.from(this.getActivity());
         View convertView = mInflater.inflate(R.layout.base_dialog_view, null);

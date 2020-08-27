@@ -24,6 +24,7 @@ public class TimerView extends TextView {
     private long mStartTime;
     private long mOffsetTime;
     private long mRealTakeTime;
+    private int mState; // 0初始态, 1开始计时， 2暂停， -1停止
 
     public TimerView(Context context) {
         this(context, null);
@@ -47,38 +48,40 @@ public class TimerView extends TextView {
     }
 
     public void startTimerWithMillis(long offsetTime) {
-        if (mHandler == null) {
-            return;
-        }
+        mHandler.removeCallbacksAndMessages(null);
         mOffsetTime = offsetTime;
         mStartTime = System.currentTimeMillis();
         mHandler.sendEmptyMessage(0);
+        mState = 1;
     }
 
-    public void startTimer(){
-        if (mHandler == null) {
-            return;
+    public void startTimer() {
+        if (mState == 0 || mState == -1) {
+            mOffsetTime = 0;
+            mStartTime = System.currentTimeMillis();
+            mHandler.sendEmptyMessage(0);
+        } else if (mState == 2) {
+            mStartTime = System.currentTimeMillis();
+            mHandler.sendEmptyMessage(0);
         }
-        mStartTime = System.currentTimeMillis();
-        mHandler.sendEmptyMessage(0);
+        mState = 1;
     }
 
     // 返回
     public void pauseTimer() {
-        if (mHandler == null) {
-            return;
+        if (mState == 1) {
+            mHandler.removeCallbacksAndMessages(null);
+            mOffsetTime += System.currentTimeMillis() - mStartTime;
+            mState = 2;
         }
-        mHandler.removeCallbacksAndMessages(null);
-        mOffsetTime += System.currentTimeMillis() - mStartTime;
     }
 
     public long stopTimer() {
-        if (mHandler == null) {
-            return 0;
+        if (mState == 1) {
+            mHandler.removeCallbacksAndMessages(null);
+            mOffsetTime += System.currentTimeMillis() - mStartTime;
+            mState = -1;
         }
-        mHandler.removeCallbacksAndMessages(null);
-        mOffsetTime += System.currentTimeMillis() - mStartTime;
-        mHandler = null;
         return mOffsetTime;
     }
 
@@ -89,9 +92,7 @@ public class TimerView extends TextView {
     }
 
     public void onResetStart() {
-        mOffsetTime = 0;
-        mHandler = new TimerHandler(this);
-        startTimer();
+        startTimerWithMillis(0);
     }
 
     static class TimerHandler extends Handler {

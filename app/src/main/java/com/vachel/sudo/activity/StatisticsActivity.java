@@ -1,25 +1,28 @@
 package com.vachel.sudo.activity;
 
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
+import androidx.viewpager.widget.ViewPager;
 
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
+import com.vachel.sudo.adapter.PickerAdapter;
 import com.vachel.sudo.bean.AnalyzeResult;
 import com.vachel.sudo.dao.Record;
+import com.vachel.sudo.helper.PageChangedListener;
+import com.vachel.sudo.helper.ScaleTransformer;
 import com.vachel.sudo.manager.RecordDataManager;
+import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
+import com.vachel.sudo.widget.record.RecordItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -28,7 +31,13 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class StatisticsActivity extends BaseActivity {
 
-    private List<Record> mAllRecords;
+    private int mSelectDifficulty;
+    private int mSelectMode;
+    private RecordItem mAveTime;
+    private RecordItem mFastTime;
+    private RecordItem mSlowTime;
+    private RecordItem mLastTime;
+    private RecordItem mCount;
 
     @Override
     int getLayoutId() {
@@ -37,53 +46,120 @@ public class StatisticsActivity extends BaseActivity {
 
     @Override
     void init() {
-        final TextView aveText = findViewById(R.id.ave_text);
-        final TextView fastText = findViewById(R.id.fast_text);
-        final TextView lastText = findViewById(R.id.last_text);
-        Observable.create(new ObservableOnSubscribe<AnalyzeResult>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<AnalyzeResult> emitter) {
-                mAllRecords = RecordDataManager.getInstance().getAllRecords();
-                AnalyzeResult result = new AnalyzeResult();
-                if (mAllRecords.size()> 0){
-                    long takeTime = 0;
-                    long fastTime = mAllRecords.get(0).getTakeTime();
-                    long lastPlayTime = mAllRecords.get(0).getFinishDate();
-                    for (Record record : mAllRecords) {
-                        takeTime += record.getTakeTime();
-                        if (record.getTakeTime() < fastTime) {
-                            fastTime = record.getTakeTime();
-                        }
-                        long doneTime = record.getFinishDate();
-                        if (doneTime> lastPlayTime){
-                            lastPlayTime = doneTime;
-                        }
-                    }
-                    result.setAveTake(takeTime/ mAllRecords.size());
-                    result.setFastTake(fastTime);
-                    result.setLastTime(lastPlayTime);
-                    result.setSuccess(true);
-                } else {
-                    result.setSuccess(false);
-                }
-                emitter.onNext(result);
-                emitter.onComplete();
+        initSelectDifficulty();
+        initSelectMode();
+        mAveTime = findViewById(R.id.ave_time);
+        mFastTime = findViewById(R.id.fast_time);
+        mSlowTime = findViewById(R.id.slow_time);
+        mLastTime = findViewById(R.id.last_time);
+        mCount = findViewById(R.id.done_count);
+        initData(2, 4);
+    }
+
+    private void initData(final int mode, final int difficulty) {
+        Observable.create((ObservableOnSubscribe<AnalyzeResult>) emitter -> {
+            List<Record> allRecords;
+            if (mode == 2 && difficulty == 4) {
+                allRecords = RecordDataManager.getInstance().getAllRecords();
+            } else if (mode == 2) {
+                allRecords = RecordDataManager.getInstance().getFilterRecordsByDifficulty(difficulty);
+            } else if (difficulty == 4) {
+                allRecords = RecordDataManager.getInstance().getFilterRecordsByMode(mode);
+            } else {
+                allRecords = RecordDataManager.getInstance().getFilterRecords(mode, difficulty);
             }
+
+            AnalyzeResult result = new AnalyzeResult();
+            if (allRecords != null && allRecords.size() > 0) {
+                long takeTime = 0;
+                long fastTime = allRecords.get(0).getTakeTime();
+                long slowTime = allRecords.get(0).getTakeTime();
+                long lastPlayTime = allRecords.get(0).getFinishDate();
+                for (Record record : allRecords) {
+                    takeTime += record.getTakeTime();
+                    if (record.getTakeTime() < fastTime) {
+                        fastTime = record.getTakeTime();
+                    }
+
+                    if (record.getTakeTime() > slowTime) {
+                        slowTime = record.getTakeTime();
+                    }
+                    long doneTime = record.getFinishDate();
+                    if (doneTime > lastPlayTime) {
+                        lastPlayTime = doneTime;
+                    }
+                }
+                result.setAveTake(takeTime / allRecords.size());
+                result.setFastTake(fastTime);
+                result.setLastTime(lastPlayTime);
+                result.setSlowTime(slowTime);
+                result.setSize(allRecords.size());
+                result.setSuccess(true);
+            } else {
+                result.setSuccess(false);
+            }
+            emitter.onNext(result);
+            emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<AnalyzeResult>autoDisposable(AndroidLifecycleScopeProvider.from(StatisticsActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(new Consumer<AnalyzeResult>() {
-                    @Override
-                    public void accept(AnalyzeResult analyzeResult) {
-                        if (analyzeResult.isSuccess()){
-                            aveText.setText( "平均用时："+Utils.parseTakeTime(analyzeResult.getAveTake(), 1)+ "; 闯了"+ mAllRecords.size()+"关");
-                            fastText.setText("最快用时："+Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
-                            lastText.setText("最近一次："+Utils.parseDate(analyzeResult.getLastTime()));
-                        }else {
-
-                        }
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(StatisticsActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(analyzeResult -> {
+                    if (analyzeResult.isSuccess()) {
+                        mAveTime.setItemValue(Utils.parseTakeTime(analyzeResult.getAveTake(), 1));
+                        mFastTime.setItemValue(Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
+                        mSlowTime.setItemValue(Utils.parseTakeTime(analyzeResult.getSlowTime(), 1));
+                        mLastTime.setItemValue(Utils.parseDate(analyzeResult.getLastTime()));
+                        mCount.setItemValue(analyzeResult.getSize()+"");
+                    } else {
+                        String nullTime = StatisticsActivity.this.getString(R.string.default_take_time);
+                        mAveTime.setItemValue(nullTime);
+                        mFastTime.setItemValue(nullTime);
+                        mSlowTime.setItemValue(nullTime);
+                        mLastTime.setItemValue("暂无记录");
+                        mCount.setItemValue("0");
                     }
                 });
+    }
 
+    private void initSelectMode() {
+        final ViewPager pickSelect = findViewById(R.id.pick_mode);
+        ArrayList<String> data = new ArrayList<>();
+        data.add("随机模式");
+        data.add("闯关玩法");
+        data.add("综合");
+        final PickerAdapter adapter = new PickerAdapter(data, position -> pickSelect.setCurrentItem(position, true));
+        pickSelect.setAdapter(adapter);
+        mSelectMode = PreferencesUtils.getIntegerPreference(this, Constants.GAME_MODE, 0);
+        pickSelect.setCurrentItem(adapter.getDataCount() * 2000 - 1 + mSelectDifficulty);
+        pickSelect.setPageTransformer(false, new ScaleTransformer());
+        pickSelect.addOnPageChangeListener(new PageChangedListener() {
+            @Override
+            public void onSelected(int position) {
+                mSelectMode = position % adapter.getDataCount();
+                initData(mSelectMode, mSelectDifficulty);
+            }
+        });
+    }
+
+    private void initSelectDifficulty() {
+        final ViewPager pickSelect = findViewById(R.id.pick_difficulty);
+        ArrayList<String> data = new ArrayList<>();
+        data.add("简单");
+        data.add("中等");
+        data.add("困难");
+        data.add("专家");
+        data.add("综合");
+        final PickerAdapter adapter = new PickerAdapter(data, position -> pickSelect.setCurrentItem(position, true));
+        pickSelect.setAdapter(adapter);
+        mSelectDifficulty = PreferencesUtils.getIntegerPreference(this, Constants.GAME_DIFFICULTY, 0);
+        pickSelect.setCurrentItem(adapter.getDataCount() * 2000 - 1 + mSelectDifficulty);
+        pickSelect.setPageTransformer(false, new ScaleTransformer());
+        pickSelect.addOnPageChangeListener(new PageChangedListener() {
+            @Override
+            public void onSelected(int position) {
+                mSelectDifficulty = position % adapter.getDataCount();
+                initData(mSelectMode, mSelectDifficulty);
+            }
+        });
     }
 }

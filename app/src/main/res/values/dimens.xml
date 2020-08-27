@@ -13,4 +13,6 @@
     <dimen name="dialog_space">16dp</dimen>
     <dimen name="dialog_left_space">16dp</dimen>
     <dimen name="dialog_title_text_size">18sp</dimen>
+
+    <dimen name="record_item_name_width">110dp</dimen>
 </resources>

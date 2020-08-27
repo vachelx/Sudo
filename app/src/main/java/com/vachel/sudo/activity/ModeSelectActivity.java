@@ -10,16 +10,18 @@ import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.PickerAdapter;
-import com.vachel.sudo.dao.ArchiveBean;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.helper.ScaleTransformer;
+import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.PreferencesUtils;
-import com.vachel.sudo.widget.TabLayout;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+import org.simple.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -37,6 +39,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
 
     @Override
     void init() {
+        EventBus.getDefault().register(this);
         mResumeView = findViewById(R.id.resume_game);
         initSelectDifficulty();
         updateResumeView(mSelectDifficulty);
@@ -55,7 +58,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
                 .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(ModeSelectActivity.this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(result -> {
                     mResumeView.setClickable(result);
-                    mResumeView.setAlpha(result? 1.0f: 0.3f);
+                    mResumeView.setVisibility(result ? View.VISIBLE : View.INVISIBLE);
                 });
     }
 
@@ -76,6 +79,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             public void onSelected(int position) {
                 mSelectDifficulty = position % adapter.getDataCount();
                 updateResumeView(mSelectDifficulty);
+                PreferencesUtils.setIntegerPrefrence(ModeSelectActivity.this, Constants.GAME_DIFFICULTY, mSelectDifficulty);
             }
         });
     }
@@ -98,5 +102,18 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             intent.putExtra(Constants.KEY_DIFFICULTY, mSelectDifficulty);
             startActivity(intent);
         }
+    }
+
+    @Subscriber(tag = EventTag.ON_ARCHIVE_CHANGED, mode = ThreadMode.MAIN)
+    public void onSaveArchive(int[] cruxKey) {
+        if (cruxKey[0] == 0 && mSelectDifficulty == cruxKey[1]) {
+            updateResumeView(mSelectDifficulty);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

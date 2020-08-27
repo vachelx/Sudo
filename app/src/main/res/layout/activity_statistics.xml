@@ -1,24 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="@dimen/default_padding"
+    android:paddingBottom="70dp"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/ave_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="总共完成了100关，平均耗时 15分26秒"/>
+        android:textStyle="italic"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/default_text_color"
+        android:paddingBottom="8dp"
+        android:paddingLeft="24dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:text="统计模式"/>
+
+    <com.vachel.sudo.widget.TrapezoidView
+        android:layout_width="250dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:layout_gravity="left"/>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pick_mode"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp" />
 
     <TextView
-        android:id="@+id/fast_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="最快记录：3m19s"/>
+        android:textStyle="italic"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/default_text_color"
+        android:paddingBottom="8dp"
+        android:paddingLeft="24dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:text="统计难度"/>
+
+    <com.vachel.sudo.widget.TrapezoidView
+        android:layout_width="250dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:layout_gravity="left"/>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pick_difficulty"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp" />
 
     <TextView
-        android:id="@+id/last_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="上一次闯关时间为："/>
+        android:textStyle="italic"
+        android:layout_marginTop="25dp"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/default_text_color"
+        android:paddingBottom="8dp"
+        android:paddingLeft="24dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:text="统计成绩"/>
+
+    <com.vachel.sudo.widget.TrapezoidView
+        android:layout_width="250dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/default_padding"
+        android:layout_gravity="left"/>
+
+    <com.vachel.sudo.widget.record.RecordItem
+        android:id="@+id/ave_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:first_text="平均耗时："
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="@dimen/default_padding"
+        app:second_text="05h13min14s"/>
+
+    <com.vachel.sudo.widget.record.RecordItem
+        android:id="@+id/fast_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:first_text="最快记录："
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="@dimen/default_padding"
+        app:second_text="3min14s"/>
+
+    <com.vachel.sudo.widget.record.RecordItem
+        android:id="@+id/slow_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:first_text="最慢记录："
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="@dimen/default_padding"
+        app:second_text="05h13min14s"/>
+
+    <com.vachel.sudo.widget.record.RecordItem
+        android:id="@+id/last_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:first_text="最近一次："
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="@dimen/default_padding"
+        app:second_text="2020.8.27 12:26:36"/>
+
+    <com.vachel.sudo.widget.record.RecordItem
+        android:id="@+id/done_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:first_text="完成/题："
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="@dimen/default_padding"
+        app:second_text="27"/>
 
 </LinearLayout>

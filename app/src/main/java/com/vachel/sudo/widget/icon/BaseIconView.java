@@ -14,11 +14,11 @@ import androidx.annotation.Nullable;
 import com.vachel.sudo.R;
 
 public abstract class BaseIconView extends View {
-    Paint mPaint;
-    Path mPath;
-    int mPaintWidth = 8;
-    int mColorBlue;
-    boolean mIsPressed;
+    protected Paint mPaint;
+    protected Path mPath;
+    protected int mPaintWidth = 8;
+    protected int mColorBlue;
+    protected boolean mIsPressed;
 
     public BaseIconView(Context context) {
         this(context, null);

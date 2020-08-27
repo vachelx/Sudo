@@ -1,7 +1,5 @@
 package com.vachel.sudo.activity;
 
-
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -62,19 +60,30 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        mCruxKey = intent.getIntArrayExtra(Constants.KEY_EXAM);
+        mIsResume = intent.getBooleanExtra(Constants.KEY_RESUME, false);
+        mReplayView.setVisibility(View.GONE);
+        mNextGameView.setVisibility(View.GONE);
+        initData();
+    }
+
+    @Override
     void init() {
         mHandler = new InnerHandler(this);
         mPresenter = new SudoPresenter();
+        initView();
+
         Intent intent = getIntent();
         mCruxKey = intent.getIntArrayExtra(Constants.KEY_EXAM);
         mIsResume = intent.getBooleanExtra(Constants.KEY_RESUME, false);
-        mSudoView = findViewById(R.id.sudo_view);
-        mReplayView = findViewById(R.id.replay);
-        mNextGameView = findViewById(R.id.next_game);
-        mInputView = findViewById(R.id.input_layout);
-        mTimer = findViewById(R.id.timer);
-        mInputView.setOnTextClickListener(mSudoView);
-        mSudoView.setBoardListener(this);
+        initData();
+    }
+
+    private void initData() {
+
+
         Observable.create((ObservableOnSubscribe<Integer[][]>) emitter -> {
             if (mIsResume) {
                 ArchiveBean archive = ArchiveDataManager.getInstance().getArchiveByDiff(mCruxKey[0], mCruxKey[1]);
@@ -105,7 +114,16 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
                     }
                     hasInit = true;
                 });
+    }
 
+    private void initView() {
+        mSudoView = findViewById(R.id.sudo_view);
+        mReplayView = findViewById(R.id.replay);
+        mNextGameView = findViewById(R.id.next_game);
+        mInputView = findViewById(R.id.input_layout);
+        mTimer = findViewById(R.id.timer);
+        mInputView.setOnTextClickListener(mSudoView);
+        mSudoView.setBoardListener(this);
         mReplayView.setOnClickListener(v -> mSudoView.startCompleteAnim());
         mNextGameView.setOnClickListener(v -> goNextGame());
     }
@@ -171,7 +189,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     @Override
-    public void jumpNext() {
+    public void completeExam() {
         new BaseAlertDialog()
                 .initDialog("", "恭喜你！用时" + Utils.parseTakeTime(mTimer.getTakeTime(), 0) + "。是否进入下一关？")
                 .setPositiveTextDefault()
@@ -199,7 +217,6 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         nextKey[3] = mCruxKey[3] + 1;
         intent.putExtra(Constants.KEY_EXAM, nextKey);
         startActivity(intent);
-        finish();
     }
 
     @Override

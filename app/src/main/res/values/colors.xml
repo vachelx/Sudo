@@ -13,6 +13,7 @@
 
     <color name="main_blue">#5F80FF</color>
     <color name="main_blue_dark">#5E7FFF</color>
+    <color name="blue_dark">#303F9F</color>
 
     <color name="main_color_red"> #FF6666</color>
     <color name="default_text_color">#525252</color>

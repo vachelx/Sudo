@@ -16,6 +16,12 @@
         android:gravity="center"
         android:padding="16dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/title_name"
+            vachel:layout_constraintLeft_toLeftOf="parent"/>
+
         <com.vachel.sudo.widget.TimerView
             android:id="@+id/timer"
             android:layout_width="wrap_content"
@@ -37,7 +43,7 @@
             vachel:layout_constraintRight_toLeftOf="@+id/next_game"
             vachel:layout_constraintTop_toBottomOf="@id/timer"
             vachel:layout_constraintLeft_toLeftOf="parent"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/next_game"
@@ -45,7 +51,7 @@
             android:layout_height="30dp"
             android:background="@drawable/selector_icon_bg"
             android:textColor="@color/main_blue"
-            android:visibility="gone"
+            android:visibility="visible"
             android:textStyle="bold"
             vachel:layout_constraintRight_toRightOf="parent"
             vachel:layout_constraintLeft_toRightOf="@id/replay"

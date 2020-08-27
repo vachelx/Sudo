@@ -44,10 +44,21 @@ public class RecordDataManager {
         return DatabaseManager.getRecordDao().loadAll();
     }
 
-    // 用于随机模式主动获取record记录， 以便于保存时不会覆盖
     public int getRecordSizeByClassify(int mode, int difficulty) {
         List<Record> records = DatabaseManager.getRecordDao().queryBuilder().where(RecordDao.Properties.Mode.eq(mode), RecordDao.Properties.Difficulty.eq(difficulty)).build().list();
         return records.size();
+    }
+
+    public List<Record> getFilterRecords(int mode, int difficulty) {
+        return DatabaseManager.getRecordDao().queryBuilder().where(RecordDao.Properties.Mode.eq(mode), RecordDao.Properties.Difficulty.eq(difficulty)).build().list();
+    }
+
+    public List<Record> getFilterRecordsByDifficulty(int difficulty) {
+        return DatabaseManager.getRecordDao().queryBuilder().where(RecordDao.Properties.Difficulty.eq(difficulty)).build().list();
+    }
+
+    public List<Record> getFilterRecordsByMode(int mode) {
+        return DatabaseManager.getRecordDao().queryBuilder().where(RecordDao.Properties.Mode.eq(mode)).build().list();
     }
 
 }

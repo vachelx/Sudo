@@ -8,7 +8,14 @@ import android.os.Parcelable;
  * Describe:
  */
 public class AnalyzeResult implements Parcelable {
-    public AnalyzeResult(){
+    private long slowTime;
+    private int size;
+    private boolean success;
+    private long fastTake;
+    private long aveTake;
+    private long lastTime;
+
+    public AnalyzeResult() {
 
     }
 
@@ -44,10 +51,21 @@ public class AnalyzeResult implements Parcelable {
         this.lastTime = lastTime;
     }
 
-    private boolean success;
-    private long fastTake;
-    private long aveTake;
-    private long lastTime;
+    public long getSlowTime() {
+        return slowTime;
+    }
+
+    public void setSlowTime(long slowTime) {
+        this.slowTime = slowTime;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 
     protected AnalyzeResult(Parcel in) {
         success = in.readByte() != 0;

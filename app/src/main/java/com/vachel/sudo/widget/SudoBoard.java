@@ -1,9 +1,6 @@
 package com.vachel.sudo.widget;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -497,7 +494,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
         mBreathProgress = -2;
         // 第一次完成才跳转
         if (!mHasPopComplete && mBoardListener != null) {
-            mBoardListener.jumpNext();
+            mBoardListener.completeExam();
             mHasPopComplete = true;
         }
     }
@@ -512,7 +509,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
 
         void handleNextFrame(int size);
 
-        void jumpNext();
+        void completeExam();
 
         void onReset();
 
