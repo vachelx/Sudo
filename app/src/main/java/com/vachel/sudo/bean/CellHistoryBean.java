@@ -17,6 +17,10 @@ public class CellHistoryBean implements Parcelable {
     private Integer value = 0;
     private TreeSet<Integer> markValue;
 
+    public CellHistoryBean(){
+
+    }
+
     public CellHistoryBean(int x, int y, Integer value){
         this.x = x;
         this.y = y;

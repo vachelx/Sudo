@@ -40,6 +40,8 @@ import static com.vachel.sudo.utils.Constants.UN_SHOW_RESUME_ACTION_TIPS;
 public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemClickListener {
     private int mDifficulty;
     private RecyclerView mListView;
+    private long mLastClickTime;
+    private int mLastClickPosition;
 
     @Override
     int getLayoutId() {
@@ -77,6 +79,15 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                 .subscribe(result -> {
                     LevelAdapter myRecyclerAdapter = new LevelAdapter(this, this, result);
                     mListView.setAdapter(myRecyclerAdapter);
+                    int currentLevel = 0;
+                    if (result.get(0).getTakeTime() > 0) {
+                        for (int i = 1; i < result.size(); i++) {
+                            if (result.get(i).getTakeTime() == 0 && result.get(i - 1).getTakeTime() > 0) {
+                                currentLevel = i;
+                            }
+                        }
+                    }
+                    mListView.scrollToPosition(currentLevel);
                 });
     }
 

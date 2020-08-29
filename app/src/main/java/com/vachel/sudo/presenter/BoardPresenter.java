@@ -3,110 +3,114 @@ package com.vachel.sudo.presenter;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
+import android.graphics.Canvas;
 import android.view.animation.OvershootInterpolator;
 
-import com.vachel.sudo.utils.Utils;
+import com.vachel.sudo.bean.CellTouchBean;
+import com.vachel.sudo.helper.SudoIterator;
+import com.vachel.sudo.render.BoardLinesRender;
+import com.vachel.sudo.render.EdgeGradientRender;
+import com.vachel.sudo.render.InnerLinesRender;
+import com.vachel.sudo.render.cell.BaseCellRender;
+import com.vachel.sudo.render.cell.CellRender;
+import com.vachel.sudo.render.cell.CommonParams;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import static com.vachel.sudo.utils.Constants.ERROR_RECT_WIDTH;
 
 /**
  * Created by jianglixuan on 2020/8/20.
  * Describe:
  */
-public class BoardPresenter {
-    private IAnimCallback mCallback;
-    private int[][] mAnimStartOffset = new int[9][9];
-    private float[] mInnerLines;
-    private float[] mBoardLines;
+public class BoardPresenter implements BaseCellRender.ICellCallback {
+
+    private ISudoView mView;
     private boolean mStartCompleteAnim;
-    private int mCompleteAnimIndex;
     private int mErrorAnimProgress = 0;
     private ValueAnimator mErrorAnim;
-    private LinearGradient mGradient[]= new LinearGradient[4];
+    private int mBreathProgress = -1;  // 默认值-1；complete前， completeAnim中为大于0；completeAnim完成后为-2
+    private int mInflateProgress = 200;
+    private final CommonParams mCommonParams;
+    private final InnerLinesRender mInnerLinesRender;
+    private final BoardLinesRender mBoardLinesRender;
+    private final EdgeGradientRender mEdgeGradientRender;
+    private CellRender[][] mCellRenders;
+    private int mCompletePopProgress;
 
-    public BoardPresenter(IAnimCallback cb) {
-        mCallback = cb;
+    public CellRender[][] getCellRenders() {
+        return mCellRenders;
     }
 
-
-    public LinearGradient[] getGradient() {
-        return mGradient;
+    public BoardPresenter(ISudoView cb) {
+        mView = cb;
+        mCommonParams = new CommonParams();
+        mCellRenders = new CellRender[9][9];
+        mInnerLinesRender = new InnerLinesRender();
+        mBoardLinesRender = new BoardLinesRender();
+        mEdgeGradientRender = new EdgeGradientRender();
+        SudoIterator.execute(mCellRenders, (i, j, value) -> mCellRenders[i][j] = new CellRender(i, j, mCommonParams, this));
     }
 
-    // 单元格分割线
-    public float[] getInnerLines(float cellWidth) {
-        if (mInnerLines == null) {
-            mInnerLines = Utils.getInnerLines(cellWidth);
-        }
-        return mInnerLines;
+    public void initCellsData(Integer[][] data) {
+        SudoIterator.execute(mCellRenders, (i, j, value) -> value.initDataByExam(data[i][j]));
     }
 
-    // 大宫格分割线
-    public float[] getBoardLines(float perWidth) {
-        if (mBoardLines == null) {
-            mBoardLines = new float[]{
-                    0, perWidth, perWidth * 3, perWidth,
-                    0, perWidth * 2, perWidth * 3, perWidth * 2,
-                    perWidth, 0, perWidth, perWidth * 3,
-                    perWidth * 2, 0, perWidth * 2, perWidth * 3
-            };
-        }
-        return mBoardLines;
+    public void initCellWidth(float cellWidth) {
+        mCommonParams.cellWidth = cellWidth;
+        SudoIterator.execute(mCellRenders, (i, j, value) -> value.initLocation(cellWidth));
     }
 
     // 初始进入棋盘时，加载动画（数字随机跃入）
     public void doInflateAnim() {
-        Random random = new Random();
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                int startValue = random.nextInt(100);
-                mAnimStartOffset[i][j] = startValue;
-            }
-        }
+        final Random random = new Random();
+        SudoIterator.execute(mCellRenders, (i, j, value) -> {
+            value.mStartAnimOffset = random.nextInt(100);
+        });
         ValueAnimator inflateAnim = ValueAnimator.ofInt(0, 200);
         inflateAnim.addUpdateListener(animation -> {
-            int progress = (int) animation.getAnimatedValue();
-            mCallback.onInflateAnimProgress(progress);
+            mInflateProgress = (int) animation.getAnimatedValue();
+            mView.invalidate();
         });
         inflateAnim.setDuration(600);
         inflateAnim.start();
     }
 
-    // 根据随机开始offset计算出实际动画进度
-    public float getRelativeProgress(int i, int j, int progress) {
-        int offset = mAnimStartOffset[i][j];
-        if (progress > offset) {
-            progress = progress - offset;
-            if (progress > 100) {
-                progress = 100;
-            }
-        } else {
-            progress = 0;
-        }
-        return progress / 100f;
-    }
-
-    public void prepareStartCompleteAnimData(ArrayList<int[]> mRightStep, Integer[][] mTmpData) {
+    public void startCompleteAnim(ArrayList<int[]> rightStep) {
         if (mErrorAnim != null) {
             mErrorAnim.cancel();
         }
+        mBreathProgress = -1;
         ArrayList<int[]> extra = new ArrayList<>();
-        for (int i = 0; i < mRightStep.size(); i++) {
-            int[] step = mRightStep.get(i);
-            if (mTmpData[step[0]][step[1]] != step[2]) {
+        for (int i = 0; i < rightStep.size(); i++) {
+            int[] step = rightStep.get(i);
+            if (mCellRenders[step[0]][step[1]].mCellValue != step[2]) {
                 extra.add(step);
             }
         }
-        mRightStep.removeAll(extra);
-        mStartCompleteAnim = true;
-        mCompleteAnimIndex = 0;
+        rightStep.removeAll(extra);
+
+        int size = rightStep.size();
+        int duration = size < 15 ? 300 : size * 20;
+        ValueAnimator anim = ValueAnimator.ofInt(0, 100);
+        anim.addUpdateListener(animation -> {
+            mCompletePopProgress = (int) animation.getAnimatedValue();
+            mView.invalidate();
+        });
+        anim.addListener(new AnimatorListenerAdapter() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mStartCompleteAnim = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mView.onBreathAnimEnd();
+               doBreathAnim();
+            }
+        });
+        anim.setDuration(duration);
+        anim.start();
     }
 
     public boolean isStartCompleteAnim() {
@@ -117,34 +121,51 @@ public class BoardPresenter {
         mStartCompleteAnim = b;
     }
 
-    public int getCurrentAnimIndex() {
-        return mCompleteAnimIndex++;
-    }
-
     public int getErrorAnimProgress() {
         return mErrorAnimProgress;
     }
 
-    public interface IAnimCallback {
-        void onInflateAnimProgress(int value);
+    public void drawErrorAnimIfNeed(Canvas canvas, int width, int height) {
+        if (getErrorAnimProgress() != 0) {
+            mEdgeGradientRender.drawEdge(canvas, width, height);
+        }
+    }
 
-        void onBreathAnimProgress(int value);
+    public void drawCompleteAnim(Canvas canvas, CellTouchBean touchCell, ArrayList<int[]> rightStep) {
+        SudoIterator.execute(getCellRenders(), (i, j, value) -> {
+            if (value.mIsImmutable) {
+                value.onDraw(canvas, touchCell);
+            }
+        });
+        int showSize = (int) (mCompletePopProgress / 100f * rightStep.size());
+        for (int i = 0; i < showSize; i++) {
+            int[] step = rightStep.get(i);
+            mCellRenders[step[0]][step[1]].drawCompleteProgress(canvas, mBreathProgress);
+        }
+    }
 
+    public void drawLines(Canvas canvas) {
+        mInnerLinesRender.drawInnerLines(canvas, mCommonParams.cellWidth);
+        mBoardLinesRender.drawLines(canvas, mCommonParams.cellWidth, mCommonParams.circlePaint);
+    }
+
+    public interface ISudoView {
         void onBreathAnimEnd();
 
-        void onErrorAnimProgress(int value);
+        void invalidate();
     }
 
     public void doBreathAnim() {
         ValueAnimator anim = ValueAnimator.ofInt(100, 20, 100);
         anim.addUpdateListener(animation -> {
-            int progress = (int) animation.getAnimatedValue();
-            mCallback.onBreathAnimProgress(progress);
+            mBreathProgress = (int) animation.getAnimatedValue();
+            mView.invalidate();
         });
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mCallback.onBreathAnimEnd();
+                mView.onBreathAnimEnd();
+                mBreathProgress = -2;
             }
         });
         anim.setDuration(450);
@@ -160,13 +181,8 @@ public class BoardPresenter {
         mErrorAnim.addUpdateListener(animation -> {
             int progress = (int) animation.getAnimatedValue();
             mErrorAnimProgress = progress;
-            int alpha = (int) (mErrorAnimProgress / 100f * 255);
-            int startColor = Color.argb(alpha, 255, 102, 102);
-            mGradient[0] = new LinearGradient(0, 0, ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
-            mGradient[1] = new LinearGradient(0, 0, 0, ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
-            mGradient[2] = new LinearGradient(width, 0, width - ERROR_RECT_WIDTH, 0, startColor, 0, Shader.TileMode.MIRROR);
-            mGradient[3] = new LinearGradient(0, height, 0, height - ERROR_RECT_WIDTH, startColor, 0, Shader.TileMode.MIRROR);
-            mCallback.onErrorAnimProgress(progress);
+            mEdgeGradientRender.updateGradient(width, height, progress);
+            mView.invalidate();
         });
         mErrorAnim.setDuration(800);
         mErrorAnim.addListener(new AnimatorListenerAdapter() {
@@ -186,4 +202,66 @@ public class BoardPresenter {
         mErrorAnim.start();
     }
 
+    public CellRender getCell(int x, int y) {
+        return mCellRenders[x][y];
+    }
+
+    public Integer[][] getTmpData() {
+        Integer[][] tmp = new Integer[9][9];
+        SudoIterator.execute(mCellRenders, (i, j, value) -> tmp[i][j] = value.mCellValue);
+        return tmp;
+    }
+
+    public boolean hasNoFilledData() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                CellRender cellRender = mCellRenders[i][j];
+                if (!cellRender.mIsImmutable) {
+                    if (cellRender.mCellValue != 0 || cellRender.mMarkValues != null && cellRender.mMarkValues.size() > 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkInputFinish() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (mCellRenders[i][j].mCellValue == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void resetState() {
+        mBreathProgress = -1;
+        mInflateProgress = 200;
+        SudoIterator.execute(mCellRenders, (i, j, value) -> {
+            if (!value.mIsImmutable) {
+                value.mMarkValues = null;
+                value.mCellValue = 0;
+            }
+        });
+    }
+
+    public void resetMarks() {
+        SudoIterator.execute(mCellRenders, (i, j, value) -> {
+            if (!value.mIsImmutable) {
+                value.mMarkValues = null;
+            }
+        });
+    }
+
+    public boolean isBreathAimEnd() {
+        return mBreathProgress == -2;
+    }
+
+    @Override
+    public int getInflateAnimProgress() {
+        return mInflateProgress;
+    }
 }

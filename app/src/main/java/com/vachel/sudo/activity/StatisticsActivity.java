@@ -58,67 +58,73 @@ public class StatisticsActivity extends BaseActivity {
 
     private void initData(final int mode, final int difficulty) {
         Observable.create((ObservableOnSubscribe<AnalyzeResult>) emitter -> {
-            List<Record> allRecords;
-            if (mode == 2 && difficulty == 4) {
-                allRecords = RecordDataManager.getInstance().getAllRecords();
-            } else if (mode == 2) {
-                allRecords = RecordDataManager.getInstance().getFilterRecordsByDifficulty(difficulty);
-            } else if (difficulty == 4) {
-                allRecords = RecordDataManager.getInstance().getFilterRecordsByMode(mode);
-            } else {
-                allRecords = RecordDataManager.getInstance().getFilterRecords(mode, difficulty);
-            }
-
-            AnalyzeResult result = new AnalyzeResult();
-            if (allRecords != null && allRecords.size() > 0) {
-                long takeTime = 0;
-                long fastTime = allRecords.get(0).getTakeTime();
-                long slowTime = allRecords.get(0).getTakeTime();
-                long lastPlayTime = allRecords.get(0).getFinishDate();
-                for (Record record : allRecords) {
-                    takeTime += record.getTakeTime();
-                    if (record.getTakeTime() < fastTime) {
-                        fastTime = record.getTakeTime();
-                    }
-
-                    if (record.getTakeTime() > slowTime) {
-                        slowTime = record.getTakeTime();
-                    }
-                    long doneTime = record.getFinishDate();
-                    if (doneTime > lastPlayTime) {
-                        lastPlayTime = doneTime;
-                    }
-                }
-                result.setAveTake(takeTime / allRecords.size());
-                result.setFastTake(fastTime);
-                result.setLastTime(lastPlayTime);
-                result.setSlowTime(slowTime);
-                result.setSize(allRecords.size());
-                result.setSuccess(true);
-            } else {
-                result.setSuccess(false);
-            }
-            emitter.onNext(result);
+            emitter.onNext(getAnalyzeData(mode, difficulty));
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
                 .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(StatisticsActivity.this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(analyzeResult -> {
-                    if (analyzeResult.isSuccess()) {
-                        mAveTime.setItemValue(Utils.parseTakeTime(analyzeResult.getAveTake(), 1));
-                        mFastTime.setItemValue(Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
-                        mSlowTime.setItemValue(Utils.parseTakeTime(analyzeResult.getSlowTime(), 1));
-                        mLastTime.setItemValue(Utils.parseDate(analyzeResult.getLastTime()));
-                        mCount.setItemValue(analyzeResult.getSize()+"");
-                    } else {
-                        String nullTime = StatisticsActivity.this.getString(R.string.default_take_time);
-                        mAveTime.setItemValue(nullTime);
-                        mFastTime.setItemValue(nullTime);
-                        mSlowTime.setItemValue(nullTime);
-                        mLastTime.setItemValue("暂无记录");
-                        mCount.setItemValue("0");
-                    }
-                });
+                .subscribe(this::updateViewsText);
+    }
+
+    private AnalyzeResult getAnalyzeData(int mode, int difficulty) {
+        List<Record> allRecords;
+        if (mode == 2 && difficulty == 4) {
+            allRecords = RecordDataManager.getInstance().getAllRecords();
+        } else if (mode == 2) {
+            allRecords = RecordDataManager.getInstance().getFilterRecordsByDifficulty(difficulty);
+        } else if (difficulty == 4) {
+            allRecords = RecordDataManager.getInstance().getFilterRecordsByMode(mode);
+        } else {
+            allRecords = RecordDataManager.getInstance().getFilterRecords(mode, difficulty);
+        }
+
+        AnalyzeResult result = new AnalyzeResult();
+        if (allRecords != null && allRecords.size() > 0) {
+            long takeTime = 0;
+            long fastTime = allRecords.get(0).getTakeTime();
+            long slowTime = allRecords.get(0).getTakeTime();
+            long lastPlayTime = allRecords.get(0).getFinishDate();
+            for (Record record : allRecords) {
+                takeTime += record.getTakeTime();
+                if (record.getTakeTime() < fastTime) {
+                    fastTime = record.getTakeTime();
+                }
+
+                if (record.getTakeTime() > slowTime) {
+                    slowTime = record.getTakeTime();
+                }
+                long doneTime = record.getFinishDate();
+                if (doneTime > lastPlayTime) {
+                    lastPlayTime = doneTime;
+                }
+            }
+            result.setAveTake(takeTime / allRecords.size());
+            result.setFastTake(fastTime);
+            result.setLastTime(lastPlayTime);
+            result.setSlowTime(slowTime);
+            result.setSize(allRecords.size());
+            result.setSuccess(true);
+        } else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
+
+    private void updateViewsText(AnalyzeResult analyzeResult) {
+        if (analyzeResult.isSuccess()) {
+            mAveTime.setItemValue(Utils.parseTakeTime(analyzeResult.getAveTake(), 1));
+            mFastTime.setItemValue(Utils.parseTakeTime(analyzeResult.getFastTake(), 1));
+            mSlowTime.setItemValue(Utils.parseTakeTime(analyzeResult.getSlowTime(), 1));
+            mLastTime.setItemValue(Utils.parseDate(analyzeResult.getLastTime()));
+            mCount.setItemValue(analyzeResult.getSize()+"");
+        } else {
+            String nullTime = StatisticsActivity.this.getString(R.string.default_take_time);
+            mAveTime.setItemValue(nullTime);
+            mFastTime.setItemValue(nullTime);
+            mSlowTime.setItemValue(nullTime);
+            mLastTime.setItemValue("暂无记录");
+            mCount.setItemValue("0");
+        }
     }
 
     private void initSelectMode() {

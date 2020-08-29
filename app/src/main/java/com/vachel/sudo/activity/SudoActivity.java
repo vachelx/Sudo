@@ -1,11 +1,8 @@
 package com.vachel.sudo.activity;
 
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.lifecycle.Lifecycle;
 
@@ -21,7 +18,6 @@ import com.vachel.sudo.presenter.SudoPresenter;
 import com.vachel.sudo.engine.Algorithm;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.EventTag;
-import com.vachel.sudo.utils.InnerHandler;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.BaseAlertDialog;
@@ -40,11 +36,10 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListener, InnerHandler.ILifeCycleMessageHandler {
+public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListener {
     private TimerView mTimer;
     private boolean hasInit = false;
     private SudoBoard mSudoView;
-    private Handler mHandler;
     private SudoPresenter mPresenter;
     private int[] mCruxKey = new int[4];
     private Integer[][] mExamSudo;
@@ -56,6 +51,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     private TreeSet<Integer>[][] mResumeMarks;
     private long mResumeTime;
     private TrapezoidView mTitle;
+    private boolean mSolved;
 
     @Override
     int getLayoutId() {
@@ -76,7 +72,6 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
 
     @Override
     void init() {
-        mHandler = new InnerHandler(this);
         mPresenter = new SudoPresenter();
         initView();
 
@@ -151,12 +146,12 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     protected void onDestroy() {
         super.onDestroy();
         mTimer.stopTimer();
-        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
     public void onSolved() {
         final long takeTime = mTimer.stopTimer();
+        mSolved = true;
         Observable.create((ObservableOnSubscribe<Long>) emitter -> {
             long result = mPresenter.checkRecord(mCruxKey, takeTime);
             emitter.onNext(result);
@@ -182,15 +177,6 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         mNextGameView.setVisibility(View.VISIBLE);
         mInputView.setLock(true);
 
-    }
-
-    @Override
-    public void handleNextFrame(final int size) {
-        int defaultDelay = 20;
-        if (size < 20) {
-            defaultDelay = 400 / size;
-        }
-        mHandler.sendEmptyMessageDelayed(0, defaultDelay);
     }
 
     @Override
@@ -231,6 +217,7 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         }
         mInputView.setLock(false);
         mReplayView.setClickable(false);
+        mSolved = false;
     }
 
     @Override
@@ -259,15 +246,8 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     }
 
     @Override
-    public void handleMessage(Message msg) {
-        if (msg.what == 0) {
-            mSudoView.invalidate();
-        }
-    }
-
-    @Override
     public void onBackPressed() {
-        if (mSudoView.hasNoFilledData()){
+        if (mSudoView.hasNoFilledData() || mSolved) {
             super.onBackPressed();
             return;
         }
