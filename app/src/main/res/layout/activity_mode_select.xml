@@ -72,4 +72,8 @@
         android:layout_marginTop="35dp"
         app:trap_text="成绩统计" />
 
+    <com.vachel.sudo.widget.icon.SettingView
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

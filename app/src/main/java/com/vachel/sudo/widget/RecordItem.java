@@ -1,4 +1,4 @@
-package com.vachel.sudo.widget.record;
+package com.vachel.sudo.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;

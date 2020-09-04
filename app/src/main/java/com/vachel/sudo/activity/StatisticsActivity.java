@@ -13,7 +13,7 @@ import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.helper.ScaleTransformer;
 import com.vachel.sudo.manager.RecordDataManager;
 import com.vachel.sudo.utils.Utils;
-import com.vachel.sudo.widget.record.RecordItem;
+import com.vachel.sudo.widget.RecordItem;
 
 import java.util.ArrayList;
 import java.util.List;

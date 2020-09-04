@@ -74,7 +74,7 @@
         android:layout_marginLeft="@dimen/default_padding"
         android:layout_gravity="left"/>
 
-    <com.vachel.sudo.widget.record.RecordItem
+    <com.vachel.sudo.widget.RecordItem
         android:id="@+id/ave_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
         android:paddingTop="@dimen/default_padding"
         app:second_text="05h13min14s"/>
 
-    <com.vachel.sudo.widget.record.RecordItem
+    <com.vachel.sudo.widget.RecordItem
         android:id="@+id/fast_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
         android:paddingTop="@dimen/default_padding"
         app:second_text="3min14s"/>
 
-    <com.vachel.sudo.widget.record.RecordItem
+    <com.vachel.sudo.widget.RecordItem
         android:id="@+id/slow_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
         android:paddingTop="@dimen/default_padding"
         app:second_text="05h13min14s"/>
 
-    <com.vachel.sudo.widget.record.RecordItem
+    <com.vachel.sudo.widget.RecordItem
         android:id="@+id/last_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
         android:paddingTop="@dimen/default_padding"
         app:second_text="2020.8.27 12:26:36"/>
 
-    <com.vachel.sudo.widget.record.RecordItem
+    <com.vachel.sudo.widget.RecordItem
         android:id="@+id/done_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
