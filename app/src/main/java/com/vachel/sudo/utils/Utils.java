@@ -1,5 +1,6 @@
 package com.vachel.sudo.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -127,5 +128,9 @@ public class Utils {
             }
         }
         return result;
+    }
+
+    public static int dp2px(Context context, int dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 }

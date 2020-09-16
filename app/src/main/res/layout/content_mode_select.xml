@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--模拟状态栏占位-->
+    <View
+        android:id="@+id/view_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/main_blue"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_blue"
+        android:paddingLeft="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp">
+
+        <com.vachel.sudo.widget.icon.SettingView
+            android:id="@+id/setting"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="40dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/default_padding"
+            android:paddingLeft="24dp"
+            android:paddingBottom="8dp"
+            android:text="难度"
+            android:textColor="@color/default_text_color"
+            android:textSize="@dimen/small_text_size"
+            android:textStyle="italic" />
+
+        <com.vachel.sudo.widget.TrapezoidView
+            android:layout_width="250dp"
+            android:layout_height="1dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="@dimen/default_padding" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/pick_difficulty"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp" />
+
+        <TextView
+            android:id="@+id/start_game"
+            style="@style/StartButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/start_game" />
+
+        <TextView
+            android:id="@+id/resume_game"
+            style="@style/StartButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/resume_game"
+            android:visibility="invisible" />
+
+        <com.vachel.sudo.widget.TrapezoidView
+            android:layout_width="230dp"
+            android:layout_height="1dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="35dp"
+            app:trap_orientation_right="false" />
+
+        <com.vachel.sudo.widget.TrapezoidView
+            android:id="@+id/level_mode"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="35dp"
+            app:trap_orientation_right="false"
+            app:trap_text="闯关玩法" />
+
+        <com.vachel.sudo.widget.TrapezoidView
+            android:id="@+id/statistics"
+            android:layout_width="110dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="35dp"
+            app:trap_orientation_right="false"
+            app:trap_text="成绩统计" />
+    </LinearLayout>
+
+</LinearLayout>

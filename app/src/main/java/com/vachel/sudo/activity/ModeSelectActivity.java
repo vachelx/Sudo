@@ -1,14 +1,24 @@
 package com.vachel.sudo.activity;
 
 import android.content.Intent;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
+import com.nineoldandroids.view.ViewHelper;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
+import com.vachel.sudo.adapter.MyExpandAdapter;
 import com.vachel.sudo.adapter.PickerAdapter;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.manager.ArchiveDataManager;
@@ -16,6 +26,8 @@ import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.helper.ScaleTransformer;
 import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.PreferencesUtils;
+import com.vachel.sudo.utils.ScreenInfoUtils;
+import com.vachel.sudo.utils.Utils;
 
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
@@ -31,6 +43,9 @@ import io.reactivex.schedulers.Schedulers;
 public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
     private int mSelectDifficulty;
     private View mResumeView;
+    private int mStatusBarHeight;
+    private DrawerLayout mDrawerLayout;
+    private ExpandableListView mExpandList;
 
     @Override
     int getLayoutId() {
@@ -38,8 +53,46 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
+    protected void initBefore() {
+        mStatusBarHeight = ScreenInfoUtils.getStatusBarHeight(this);
+        //隐藏状态栏
+        ScreenInfoUtils.fullScreen(this);
+    }
+
+    @Override
     void init() {
+        // 初始化模拟状态栏高度
+        View statusBar = findViewById(R.id.view_status_bar);
+        statusBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mStatusBarHeight));
+        View slideStatusBar = findViewById(R.id.slide_status_bar);
+        slideStatusBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mStatusBarHeight+ Utils.dp2px(this, 47)));
+
         EventBus.getDefault().register(this);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                View mContent = mDrawerLayout.getChildAt(0);
+                ViewHelper.setTranslationX(mContent, drawerView.getMeasuredWidth() * slideOffset);
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
         mResumeView = findViewById(R.id.resume_game);
         initSelectDifficulty();
         updateResumeView(mSelectDifficulty);
@@ -47,6 +100,11 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         findViewById(R.id.statistics).setOnClickListener(this);
         findViewById(R.id.start_game).setOnClickListener(this);
         findViewById(R.id.level_mode).setOnClickListener(this);
+        findViewById(R.id.setting).setOnClickListener(this);
+
+        mExpandList = findViewById(R.id.expand_list);
+        mExpandList.setGroupIndicator(null);
+        mExpandList.setAdapter(new MyExpandAdapter(this));
     }
 
     private void updateResumeView(final int difficulty) {
@@ -101,6 +159,8 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             Intent intent = new Intent(ModeSelectActivity.this, LevelActivity.class);
             intent.putExtra(Constants.KEY_DIFFICULTY, mSelectDifficulty);
             startActivity(intent);
+        } else if(id == R.id.setting){
+            mDrawerLayout.openDrawer(Gravity.LEFT);
         }
     }
 

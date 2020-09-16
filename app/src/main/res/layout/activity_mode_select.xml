@@ -1,79 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="italic"
-        android:textSize="@dimen/small_text_size"
-        android:textColor="@color/default_text_color"
-        android:paddingBottom="8dp"
-        android:paddingLeft="24dp"
-        android:layout_marginLeft="@dimen/default_padding"
-        android:text="难度"/>
+    <include layout="@layout/content_mode_select"/>
 
-    <com.vachel.sudo.widget.TrapezoidView
-        android:layout_width="250dp"
-        android:layout_height="1dp"
-        android:layout_marginLeft="@dimen/default_padding"
-        android:layout_gravity="left"/>
+    <include layout="@layout/slide_mode_select"/>
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pick_difficulty"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="45dp"
-        android:layout_marginRight="45dp" />
-
-    <TextView
-        android:id="@+id/start_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/StartButton"
-        android:layout_marginTop="20dp"
-        android:text="@string/start_game"/>
-
-    <TextView
-        android:id="@+id/resume_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/StartButton"
-        android:layout_marginTop="20dp"
-        android:visibility="invisible"
-        android:text="@string/resume_game"/>
-
-    <com.vachel.sudo.widget.TrapezoidView
-        android:layout_width="230dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="35dp"
-        app:trap_orientation_right="false"
-        android:layout_gravity="right"/>
-
-    <com.vachel.sudo.widget.TrapezoidView
-        android:id="@+id/level_mode"
-        android:layout_width="150dp"
-        android:layout_height="30dp"
-        android:layout_gravity="right"
-        app:trap_orientation_right="false"
-        android:layout_marginTop="35dp"
-        app:trap_text="闯关玩法" />
-
-    <com.vachel.sudo.widget.TrapezoidView
-        android:id="@+id/statistics"
-        android:layout_width="110dp"
-        android:layout_height="30dp"
-        android:layout_gravity="right"
-        app:trap_orientation_right="false"
-        android:layout_marginTop="35dp"
-        app:trap_text="成绩统计" />
-
-    <com.vachel.sudo.widget.icon.SettingView
-        android:layout_width="35dp"
-        android:layout_height="wrap_content"/>
-
-</LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

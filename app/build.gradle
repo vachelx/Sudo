@@ -57,4 +57,5 @@ dependencies {
 
     implementation 'org.greenrobot:greendao:3.2.2'
     implementation 'org.simple:androideventbus:1.0.5.1'
+    implementation files('libs\\nineoldandroids-2.4.0.jar')
 }
