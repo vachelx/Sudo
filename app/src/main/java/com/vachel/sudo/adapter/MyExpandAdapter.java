@@ -1,6 +1,7 @@
 package com.vachel.sudo.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import androidx.annotation.NonNull;
 import com.vachel.sudo.R;
 import com.vachel.sudo.bean.SlideBean;
 import com.vachel.sudo.bean.SlideItem;
+import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,11 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
         slideItem2.setItemText("闯关玩法关卡列表读取存档提示弹窗");
         slideItem.setChecked(true);
         childList.add(slideItem2);
+
+        SlideItem slideItem3 = new SlideItem();
+        slideItem3.setItemText("退出关卡时弹出未保存提示");
+        slideItem3.setChecked(true);
+        childList.add(slideItem3);
 
         slideBean.setSlideItems(childList);
         mData.add(slideBean);
@@ -92,21 +100,67 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
         textView.setText(getGroup(groupPosition).getTitle());
         ImageView parentImageViw = convertView.findViewById(R.id.item_arrow);
         if (isExpanded) {
-            parentImageViw.setBackgroundResource(R.mipmap.checked_blue_bg);
+            parentImageViw.setBackgroundResource(R.mipmap.angle_down);
         } else {
-            parentImageViw.setBackgroundResource(R.mipmap.uncheck_grey_border);
+            parentImageViw.setBackgroundResource(R.mipmap.angle_right);
         }
         return convertView;
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, final ViewGroup parent) {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.slide_expand_item, parent, false);
         }
         TextView textView = convertView.findViewById(R.id.item_text);
         textView.setText(getChild(groupPosition, childPosition).getItemText());
+        final ImageView checkBox = convertView.findViewById(R.id.item_checkbox);
+        String itemKey = getItemKey(childPosition);
+        boolean initValue = PreferencesUtils.getBooleanPreference(parent.getContext(), itemKey, getItemKeyDefaultValue(childPosition));
+        checkBox.setSelected(initValue);
+        convertView.setOnClickListener(v -> {
+            boolean selected = !checkBox.isSelected();
+            checkBox.setSelected(selected);
+            onItemClick(parent.getContext(), childPosition, selected);
+
+        });
         return convertView;
+    }
+
+    private void onItemClick(Context context, int position, boolean selected) {
+        String key = getItemKey(position);
+        if (!TextUtils.isEmpty(key)) {
+            PreferencesUtils.setBooleanPreference(context, key, selected);
+//            EventBus.getDefault().post(); 暂时不需要及时通知刷新
+        }
+    }
+
+    private String getItemKey(int position) {
+        String key = null;
+        if (position == 0) {
+            key = Constants.SHOW_TIMER;
+        } else if (position == 1) {
+            key = Constants.REMAINING_USEFUL_COUNTS;
+        } else if (position == 2) {
+            key = Constants.SHOW_RESUME_ARCHIVE_TIPS;
+        } else if (position == 3) {
+            key = Constants.SAVE_TIPS_WHILE_EXIT;
+        }
+        return key;
+    }
+
+    private boolean getItemKeyDefaultValue(int position) {
+        boolean value = false;
+        if (position == 0) {
+            value = true;
+        } else if (position == 1) {
+            value = true;
+        } else if (position == 2) {
+            value = true;
+        } else if (position == 3) {
+            value = false;
+        }
+        return value;
     }
 
     @Override

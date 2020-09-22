@@ -43,6 +43,11 @@ public class StatisticsActivity extends BaseActivity {
     }
 
     @Override
+    public boolean needFullScreenTitleBar() {
+        return true;
+    }
+
+    @Override
     void init() {
         mSelectMode = 2;
         mSelectDifficulty = 4;
@@ -53,6 +58,7 @@ public class StatisticsActivity extends BaseActivity {
         mSlowTime = findViewById(R.id.slow_time);
         mLastTime = findViewById(R.id.last_time);
         mCount = findViewById(R.id.done_count);
+        findViewById(R.id.back_icon).setOnClickListener(v -> onBackPressed());
         initData(mSelectMode, mSelectDifficulty);
     }
 

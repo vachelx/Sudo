@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/slide_status_bar"
+        android:id="@+id/root_title_bar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginBottom="20dp"
@@ -32,36 +32,42 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/suggestions"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/slide_item_bg"
         android:textColor="@color/default_text_color"
-        android:textSize="@dimen/default_text_size"
+        android:textSize="@dimen/large_text_size"
         android:textStyle="bold"
         android:paddingTop="@dimen/default_padding"
         android:paddingBottom="@dimen/default_padding"
-        android:layout_marginLeft="@dimen/default_padding"
+        android:paddingLeft="@dimen/default_padding"
         android:text="反馈建议" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/support"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/slide_item_bg"
         android:textColor="@color/default_text_color"
-        android:textSize="@dimen/default_text_size"
+        android:textSize="@dimen/large_text_size"
         android:textStyle="bold"
         android:paddingTop="@dimen/default_padding"
         android:paddingBottom="@dimen/default_padding"
-        android:layout_marginLeft="@dimen/default_padding"
+        android:paddingLeft="@dimen/default_padding"
         android:text="支持作者" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/about"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/slide_item_bg"
         android:textColor="@color/default_text_color"
-        android:textSize="@dimen/default_text_size"
+        android:textSize="@dimen/large_text_size"
         android:textStyle="bold"
         android:paddingTop="@dimen/default_padding"
         android:paddingBottom="@dimen/default_padding"
-        android:layout_marginLeft="@dimen/default_padding"
+        android:paddingLeft="@dimen/default_padding"
         android:text="关于" />
 
 </LinearLayout>

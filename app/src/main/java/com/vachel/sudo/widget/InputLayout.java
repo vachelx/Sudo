@@ -122,9 +122,9 @@ public class InputLayout extends LinearLayout implements View.OnClickListener {
         }
 
         for (View view : canLockViews) {
-            if (view instanceof KeyTextView && mList.containsKey(view.getId())){
+            if (view instanceof KeyTextView && mList.containsKey(view.getId())) {
                 Integer value = mList.get(view.getId());
-                ((KeyTextView)view).setCountText(counts[value-1]+"");
+                ((KeyTextView) view).setCountText((9 - counts[value - 1]) + "");
             }
         }
 

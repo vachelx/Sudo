@@ -5,4 +5,13 @@
     <string name="common_sure">确定</string>
     <string name="common_cancel">取消</string>
     <string name="default_take_time">-- : -- : --</string>
+    <string name="support_describe">&#160;&#160;&#160;&#160;本数独App完全由个人设计开发完成，开发简约实用的工具类和小游戏是个人业余爱好，您的支持将给予开发者源源不断的动力！\n
+        &#160;&#160;&#160;&#160;您如果有什么建议或者想法，也可以联系我！
+    </string>
+    <string name="support_contact">vachelx@163.com</string>
+    <string name="copy_support_contact">已复制邮件地址</string>
+    <string name="contact_string">联系方式: </string>
+    <string name="support_developer">支持作者</string>
+    <string name="statistics">成绩统计</string>
+    <string name="level_list_page">闯关玩法</string>
 </resources>

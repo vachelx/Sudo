@@ -3,9 +3,6 @@ package com.vachel.sudo.activity;
 import android.content.Intent;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 
@@ -26,8 +23,8 @@ import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.helper.ScaleTransformer;
 import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.PreferencesUtils;
-import com.vachel.sudo.utils.ScreenInfoUtils;
 import com.vachel.sudo.utils.Utils;
+import com.vachel.sudo.widget.BaseAlertDialog;
 
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
@@ -43,7 +40,6 @@ import io.reactivex.schedulers.Schedulers;
 public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
     private int mSelectDifficulty;
     private View mResumeView;
-    private int mStatusBarHeight;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mExpandList;
 
@@ -53,10 +49,8 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
-    protected void initBefore() {
-        mStatusBarHeight = ScreenInfoUtils.getStatusBarHeight(this);
-        //隐藏状态栏
-        ScreenInfoUtils.fullScreen(this);
+    public boolean needFullScreenTitleBar() {
+        return true;
     }
 
     @Override
@@ -64,7 +58,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         // 初始化模拟状态栏高度
         View statusBar = findViewById(R.id.view_status_bar);
         statusBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mStatusBarHeight));
-        View slideStatusBar = findViewById(R.id.slide_status_bar);
+        View slideStatusBar = findViewById(R.id.root_title_bar);
         slideStatusBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mStatusBarHeight+ Utils.dp2px(this, 47)));
 
         EventBus.getDefault().register(this);
@@ -105,6 +99,10 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         mExpandList = findViewById(R.id.expand_list);
         mExpandList.setGroupIndicator(null);
         mExpandList.setAdapter(new MyExpandAdapter(this));
+
+        findViewById(R.id.suggestions).setOnClickListener(this);
+        findViewById(R.id.support).setOnClickListener(this);
+        findViewById(R.id.about).setOnClickListener(this);
     }
 
     private void updateResumeView(final int difficulty) {
@@ -161,6 +159,16 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             startActivity(intent);
         } else if(id == R.id.setting){
             mDrawerLayout.openDrawer(Gravity.LEFT);
+        } else if (id == R.id.about) {
+            new BaseAlertDialog().initDialog("", "Version 1.0.0\n\nCopyright © 2020 Vachel Design.\nAll rights reserved.")
+                    .contentGravityCenter(true)
+                    .show(getSupportFragmentManager(), "");
+        } else if (id == R.id.support) {
+            Intent intent = new Intent(ModeSelectActivity.this, SupportActivity.class);
+            startActivity(intent);
+//            mDrawerLayout.closeDrawer(Gravity.LEFT);
+        } else if (id == R.id.suggestions) {
+
         }
     }
 
@@ -175,5 +183,14 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            return;
+        }
+        super.onBackPressed();
     }
 }

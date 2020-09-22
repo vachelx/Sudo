@@ -18,6 +18,7 @@ import com.vachel.sudo.presenter.SudoPresenter;
 import com.vachel.sudo.engine.Algorithm;
 import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.EventTag;
+import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.ToastUtil;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.BaseAlertDialog;
@@ -35,6 +36,8 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.vachel.sudo.utils.Constants.SHOW_RESUME_ARCHIVE_TIPS;
 
 public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListener {
     private TimerView mTimer;
@@ -126,6 +129,11 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
         mSudoView.setBoardListener(this);
         mReplayView.setOnClickListener(v -> mSudoView.startCompleteAnim());
         mNextGameView.setOnClickListener(v -> goNextGame());
+
+        boolean showTimer = PreferencesUtils.getBooleanPreference(getApplicationContext(), Constants.SHOW_TIMER, true);
+        if (!showTimer) {
+            mTimer.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -248,6 +256,11 @@ public class SudoActivity extends BaseActivity implements SudoBoard.IBoardListen
     @Override
     public void onBackPressed() {
         if (mSudoView.hasNoFilledData() || mSolved) {
+            super.onBackPressed();
+            return;
+        }
+        boolean saveTips = PreferencesUtils.getBooleanPreference(getApplicationContext(), Constants.SAVE_TIPS_WHILE_EXIT, false);
+        if (!saveTips) {
             super.onBackPressed();
             return;
         }

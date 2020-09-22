@@ -7,7 +7,9 @@
     <dimen name="default_text_size">14sp</dimen>
     <dimen name="small_text_size">12sp</dimen>
     <dimen name="large_text_size">16sp</dimen>
-    <dimen name="xxx_large_text_size">24sp</dimen>
+    <dimen name="x_large_text_size">18sp</dimen>
+    <dimen name="xx_large_text_size">20sp</dimen>
+    <dimen name="xxx_large_text_size">22sp</dimen>
     <dimen name="default_padding">16dp</dimen>
 
     <dimen name="dialog_width">280dp</dimen>

@@ -15,6 +15,8 @@ import com.vachel.sudo.helper.SudoIterator;
 import com.vachel.sudo.presenter.BoardPresenter;
 import com.vachel.sudo.engine.Algorithm;
 import com.vachel.sudo.render.cell.CellRender;
+import com.vachel.sudo.utils.Constants;
+import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.ToastUtil;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private boolean mHasPopComplete;
     private boolean mHasLoadData;
     private CellTouchBean mTouchCell;
+    private boolean mUpdateRemainingCounts;
 
     public SudoBoard(Context context) {
         this(context, null);
@@ -49,6 +52,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     private void init() {
         mPresenter = new BoardPresenter(this);
         mTouchCell = new CellTouchBean();
+        mUpdateRemainingCounts = PreferencesUtils.getBooleanPreference(getContext(), Constants.REMAINING_USEFUL_COUNTS, true);
     }
 
     public void initData(@NonNull Integer[][] data) {
@@ -80,7 +84,7 @@ public class SudoBoard extends View implements InputLayout.IOnTextClickListener,
     }
 
     private void updateCounts() {
-        if (mBoardListener != null) {
+        if (mBoardListener != null && mUpdateRemainingCounts) {
             mBoardListener.onTextChanged(mPresenter.getTmpData());
         }
     }

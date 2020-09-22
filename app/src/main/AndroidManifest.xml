@@ -32,7 +32,12 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activity.LevelActivity"
+        android:name=".activity.LevelActivity"
+        android:exported="false"
+        android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.SupportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

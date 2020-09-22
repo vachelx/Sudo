@@ -31,7 +31,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.vachel.sudo.utils.Constants.UN_SHOW_RESUME_ACTION_TIPS;
+import static com.vachel.sudo.utils.Constants.SHOW_RESUME_ARCHIVE_TIPS;
 
 /**
  * Created by jianglixuan on 2020/8/21.
@@ -40,12 +40,15 @@ import static com.vachel.sudo.utils.Constants.UN_SHOW_RESUME_ACTION_TIPS;
 public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemClickListener {
     private int mDifficulty;
     private RecyclerView mListView;
-    private long mLastClickTime;
-    private int mLastClickPosition;
 
     @Override
     int getLayoutId() {
         return R.layout.activity_level;
+    }
+
+    @Override
+    public boolean needFullScreenTitleBar() {
+        return true;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
         tabLayout.setItems(items);
         tabLayout.setSelectItem(mDifficulty);
         tabLayout.setOnItemClickListener((view, index) -> updateSelectDifficulty(mDifficulty = index));
-
+        findViewById(R.id.back_icon).setOnClickListener(v -> onBackPressed());
 
         mListView = findViewById(R.id.level_list);
         GridLayoutManager manager =
@@ -110,8 +113,8 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                             startSudoActivity(nextKey, true);
                             return;
                         }
-                        boolean unNeedShowDialog = PreferencesUtils.getBooleanPreference(getApplicationContext(), UN_SHOW_RESUME_ACTION_TIPS, false);
-                        if (!unNeedShowDialog) {
+                        boolean showDialog = PreferencesUtils.getBooleanPreference(getApplicationContext(), SHOW_RESUME_ARCHIVE_TIPS, true);
+                        if (showDialog) {
                             showTipsDialog(nextKey);
                             return;
                         }
@@ -125,7 +128,7 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                 .initDialog("提示", "双击题号可读取存档游戏，请选择本次操作是否恢复存档？")
                 .setNegativeText("开始游戏")
                 .setPositiveText("读取存档")
-                .setShowCheckBox("不再提示", (buttonView, isChecked) -> PreferencesUtils.setBooleanPreference(getApplicationContext(), UN_SHOW_RESUME_ACTION_TIPS, isChecked))
+                .setShowCheckBox("不再提示", (buttonView, isChecked) -> PreferencesUtils.setBooleanPreference(getApplicationContext(), SHOW_RESUME_ARCHIVE_TIPS, isChecked))
                 .setListener(new BaseAlertDialog.IDialogListener() {
                     @Override
                     public void onPositiveClick() {

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import androidx.annotation.IdRes;
+import androidx.annotation.StringRes;
 
 public class ToastUtil extends Toast {
 
@@ -16,7 +16,7 @@ public class ToastUtil extends Toast {
         makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
-    public static void showShortToast(Context context, @IdRes int resId) {
+    public static void showShortToast(Context context, @StringRes int resId) {
         makeText(context, resId, Toast.LENGTH_SHORT).show();
     }
 
@@ -25,7 +25,7 @@ public class ToastUtil extends Toast {
         makeText(context, text, Toast.LENGTH_LONG).show();
     }
 
-    public static void showLongToast(Context context, @IdRes int resId) {
+    public static void showLongToast(Context context, @StringRes int resId) {
         makeText(context, resId, Toast.LENGTH_LONG).show();
     }
 
@@ -35,7 +35,7 @@ public class ToastUtil extends Toast {
         return toast;
     }
 
-    public static Toast makeText(Context context, @IdRes int resId, int duration) {
+    public static Toast makeText(Context context, @StringRes int resId, int duration) {
         String text = context.getResources().getString(resId);
         return makeText(context, text, duration);
     }

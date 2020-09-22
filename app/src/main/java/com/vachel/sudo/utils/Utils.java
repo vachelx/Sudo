@@ -90,6 +90,21 @@ public class Utils {
         return text.toString();
     }
 
+    public static String getlevelItemShowTime(long takeTime) {
+        takeTime /= 1000;
+        int hour = (int) (takeTime / 60 / 60);
+        int minute = (int) (takeTime / 60 % 60);
+        int second = (int) (takeTime % 60);
+        StringBuilder text = new StringBuilder();
+        if (hour >= 100) {
+            return text.append(hour).append("h").toString();
+        }
+        if (hour > 0) {
+            return text.append(hour).append("h").append(minute).append("m").toString();
+        }
+        return text.append(minute).append(":").append(second).append("\"").toString();
+    }
+
     public static String parseDate(long time) {
         Date date = new Date(time);
         return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);

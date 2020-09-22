@@ -2,20 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:paddingTop="24dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="@dimen/default_padding"
+        android:background="@color/main_blue">
+
+        <ImageView
+            android:id="@+id/back_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:padding="8dp"
+            android:src="@drawable/selector_arrow_back"
+            app:layout_constraintBottom_toBottomOf="@id/root_title_bar"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:text="@string/level_list_page"
+            android:textColor="@color/white"
+            android:textSize="@dimen/xx_large_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/back_icon"
+            app:layout_constraintLeft_toRightOf="@id/back_icon"
+            app:layout_constraintTop_toTopOf="@id/back_icon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.vachel.sudo.widget.TabLayout
         android:id="@+id/diff_tab"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_marginLeft="@dimen/default_padding"
-        android:layout_marginRight="@dimen/default_padding" />
+        android:layout_marginTop="@dimen/default_padding"
+        android:layout_marginBottom="@dimen/default_padding"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/level_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
 
 </LinearLayout>

@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.KeyEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +34,7 @@ public class BaseAlertDialog extends DialogFragment {
     private DialogInterface.OnKeyListener mOnKeyListener;
     private CompoundButton.OnCheckedChangeListener checkBoxChangeListener;
     private String mCheckBoxText;
+    private boolean mContentGravityCenter;
 
     public BaseAlertDialog() {
     }
@@ -83,6 +84,11 @@ public class BaseAlertDialog extends DialogFragment {
 
     public BaseAlertDialog setAutoDismissAble(boolean autoDismissAble) {
         mIsAutoDismissAble = autoDismissAble;
+        return this;
+    }
+
+    public BaseAlertDialog contentGravityCenter(boolean gravityCenter) {
+        mContentGravityCenter = gravityCenter;
         return this;
     }
 
@@ -143,6 +149,9 @@ public class BaseAlertDialog extends DialogFragment {
             content.setVisibility(View.GONE);
         } else {
             content.setText(message);
+            if (mContentGravityCenter) {
+                content.setGravity(Gravity.CENTER);
+            }
         }
 
         if (showCheckBox) {

@@ -3,10 +3,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="@dimen/default_padding"
     android:paddingBottom="70dp"
-    android:gravity="center_vertical"
     android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="@dimen/default_padding"
+        android:background="@color/main_blue">
+
+        <ImageView
+            android:id="@+id/back_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:padding="8dp"
+            android:src="@drawable/selector_arrow_back"
+            app:layout_constraintBottom_toBottomOf="@id/root_title_bar"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:text="@string/statistics"
+            android:textColor="@color/white"
+            android:textSize="@dimen/xx_large_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/back_icon"
+            app:layout_constraintLeft_toRightOf="@id/back_icon"
+            app:layout_constraintTop_toTopOf="@id/back_icon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:layout_width="match_parent"
@@ -14,6 +42,7 @@
         android:textStyle="italic"
         android:textSize="@dimen/small_text_size"
         android:textColor="@color/default_text_color"
+        android:layout_marginTop="30dp"
         android:paddingBottom="8dp"
         android:paddingLeft="24dp"
         android:layout_marginLeft="@dimen/default_padding"

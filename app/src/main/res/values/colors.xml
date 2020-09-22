@@ -8,6 +8,8 @@
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
 
+    <color name="white_a">#fbfbfb</color>
+
     <color name="grey">#C2C2C2</color>
     <color name="grey_dark">#525252</color>
 
@@ -17,8 +19,11 @@
 
     <color name="main_color_red"> #FF6666</color>
     <color name="default_text_color">#525252</color>
-    <color name="default_color_green"> #4EC286</color>
-    <color name="light_green"> #A3E1C1</color>
+
+    <color name="default_color_green">#4EC286</color>
+    <color name="light_green">#A3E1C1</color>
+    <color name="wechat_green">#22AB38</color>
+
     <color name="default_divider_color">#EE000000</color>
     <color name="default_grey_text_color">#9E9E9E</color>
 

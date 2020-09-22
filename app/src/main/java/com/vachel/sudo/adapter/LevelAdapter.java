@@ -61,7 +61,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
         Examination examination = mData.get(position);
         long takeTime = examination.getTakeTime();
         if (takeTime > 0) {
-            String take = Utils.parseTakeTime(takeTime, 0);
+            String take = Utils.getlevelItemShowTime(takeTime);
             levelItem.resetText((position + 1) + "", take);
             levelItem.setClickable(true);
             levelItem.setLevelClickListener((v, isDouble) -> mListener.onItemClick(position, isDouble));
@@ -94,7 +94,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
                     levelItem.setHasArchive(true);
                     if (levelItem.hasNullTakeTime()) { // 没有通过记录时间时才展示存档已用时间
                         long takeTime = data.getLong("take_time", 0);
-                        levelItem.updateTakeTime(Utils.parseTakeTime(takeTime, 0));
+                        levelItem.updateTakeTime(Utils.getlevelItemShowTime(takeTime));
                     }
                 }
             }
