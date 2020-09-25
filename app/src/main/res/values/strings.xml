@@ -14,4 +14,6 @@
     <string name="support_developer">支持作者</string>
     <string name="statistics">成绩统计</string>
     <string name="level_list_page">闯关玩法</string>
+    <string name="contact_qq">787273366</string>
+    <string name="copy_contact_qq">已复制QQ</string>
 </resources>

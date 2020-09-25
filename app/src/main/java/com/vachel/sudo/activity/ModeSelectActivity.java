@@ -1,10 +1,13 @@
 package com.vachel.sudo.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -17,6 +20,7 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.MyExpandAdapter;
 import com.vachel.sudo.adapter.PickerAdapter;
+import com.vachel.sudo.bean.SlideItem;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.utils.Constants;
@@ -99,6 +103,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         mExpandList = findViewById(R.id.expand_list);
         mExpandList.setGroupIndicator(null);
         mExpandList.setAdapter(new MyExpandAdapter(this));
+        mExpandList.expandGroup(0);
 
         findViewById(R.id.suggestions).setOnClickListener(this);
         findViewById(R.id.support).setOnClickListener(this);
@@ -160,15 +165,25 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         } else if(id == R.id.setting){
             mDrawerLayout.openDrawer(Gravity.LEFT);
         } else if (id == R.id.about) {
-            new BaseAlertDialog().initDialog("", "Version 1.0.0\n\nCopyright © 2020 Vachel Design.\nAll rights reserved.")
+            new BaseAlertDialog().initDialog("", "Version " + getAppVersion() + "\n\nCopyright © 2020 Vachel Design.\nAll rights reserved.")
                     .contentGravityCenter(true)
                     .show(getSupportFragmentManager(), "");
         } else if (id == R.id.support) {
             Intent intent = new Intent(ModeSelectActivity.this, SupportActivity.class);
             startActivity(intent);
-//            mDrawerLayout.closeDrawer(Gravity.LEFT);
         } else if (id == R.id.suggestions) {
 
+        }
+    }
+
+    public String getAppVersion() {
+        try {
+            PackageManager manager = getPackageManager();
+            PackageInfo info = manager.getPackageInfo(getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 
@@ -177,6 +192,12 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         if (cruxKey[0] == 0 && mSelectDifficulty == cruxKey[1]) {
             updateResumeView(mSelectDifficulty);
         }
+    }
+
+    @Subscriber(tag = EventTag.SHOW_RESUME_ARCHIVE_TIPS, mode = ThreadMode.MAIN)
+    public void onSaveArchive(boolean show) {
+        mExpandList.collapseGroup(0);
+        mExpandList.expandGroup(0);
     }
 
     @Override

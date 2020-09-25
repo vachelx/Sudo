@@ -78,7 +78,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/default_padding"
+            android:padding="8dp"
             android:text="@string/contact_string"
             android:textColor="@color/default_text_color" />
 
@@ -88,6 +88,29 @@
             android:layout_height="wrap_content"
             android:autoLink="email"
             android:text="@string/support_contact" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_padding"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="QQ: "
+            android:textColor="@color/default_text_color" />
+
+        <TextView
+            android:id="@+id/contact_qq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:textColor="@color/main_blue"
+            android:text="@string/contact_qq" />
     </LinearLayout>
 
 </LinearLayout>

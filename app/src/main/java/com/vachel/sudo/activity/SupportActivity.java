@@ -29,6 +29,16 @@ public class SupportActivity extends BaseActivity implements View.OnClickListene
             }
             return true;
         });
+
+        findViewById(R.id.contact_qq).setOnLongClickListener(v -> {
+            ClipboardManager cm = (ClipboardManager) getSystemService(SupportActivity.CLIPBOARD_SERVICE);
+            if (cm != null) {
+                ClipData mClipData = ClipData.newPlainText("Label", getString(R.string.contact_qq));
+                cm.setPrimaryClip(mClipData);
+                ToastUtil.showShortToast(SupportActivity.this, R.string.copy_contact_qq);
+            }
+            return true;
+        });
         findViewById(R.id.back_icon).setOnClickListener(this);
     }
 

@@ -131,7 +131,6 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
         String key = getItemKey(position);
         if (!TextUtils.isEmpty(key)) {
             PreferencesUtils.setBooleanPreference(context, key, selected);
-//            EventBus.getDefault().post(); 暂时不需要及时通知刷新
         }
     }
 

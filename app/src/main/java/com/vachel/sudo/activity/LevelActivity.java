@@ -128,7 +128,10 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
                 .initDialog("提示", "双击题号可读取存档游戏，请选择本次操作是否恢复存档？")
                 .setNegativeText("开始游戏")
                 .setPositiveText("读取存档")
-                .setShowCheckBox("不再提示", (buttonView, isChecked) -> PreferencesUtils.setBooleanPreference(getApplicationContext(), SHOW_RESUME_ARCHIVE_TIPS, isChecked))
+                .setShowCheckBox("不再提示", (buttonView, isChecked) -> {
+                    PreferencesUtils.setBooleanPreference(getApplicationContext(), SHOW_RESUME_ARCHIVE_TIPS, !isChecked);
+                    EventBus.getDefault().post(!isChecked, EventTag.SHOW_RESUME_ARCHIVE_TIPS);
+                })
                 .setListener(new BaseAlertDialog.IDialogListener() {
                     @Override
                     public void onPositiveClick() {
