@@ -38,12 +38,11 @@
         android:background="@drawable/slide_item_bg"
         android:textColor="@color/default_text_color"
         android:textSize="@dimen/large_text_size"
-        android:visibility="gone"
         android:textStyle="bold"
         android:paddingTop="@dimen/default_padding"
         android:paddingBottom="@dimen/default_padding"
         android:paddingLeft="@dimen/default_padding"
-        android:text="反馈建议" />
+        android:text="@string/user_suggestions" />
 
     <TextView
         android:id="@+id/support"

@@ -55,20 +55,24 @@ public class LevelActivity extends BaseActivity implements LevelAdapter.IOnItemC
     void init() {
         EventBus.getDefault().register(this);
         mDifficulty = getIntent().getIntExtra(Constants.KEY_DIFFICULTY, 0);
+        mDifficulty = PreferencesUtils.getIntegerPreference(this, Constants.LEVEL_GAME_DIFFICULTY, this.mDifficulty);
         final TabLayout tabLayout = findViewById(R.id.diff_tab);
         String[] items = new String[]{
                 "简单", "中等", "困难", "专家"
         };
         tabLayout.setItems(items);
-        tabLayout.setSelectItem(mDifficulty);
-        tabLayout.setOnItemClickListener((view, index) -> updateSelectDifficulty(mDifficulty = index));
+        tabLayout.setSelectItem(this.mDifficulty);
+        tabLayout.setOnItemClickListener((view, index) -> {
+            PreferencesUtils.setIntegerPrefrence(LevelActivity.this, Constants.LEVEL_GAME_DIFFICULTY, index);
+            updateSelectDifficulty(this.mDifficulty = index);
+        });
         findViewById(R.id.back_icon).setOnClickListener(v -> onBackPressed());
 
         mListView = findViewById(R.id.level_list);
         GridLayoutManager manager =
                 new GridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
         mListView.setLayoutManager(manager);
-        updateSelectDifficulty(mDifficulty);
+        updateSelectDifficulty(this.mDifficulty);
     }
 
     private void updateSelectDifficulty(final int difficulty) {

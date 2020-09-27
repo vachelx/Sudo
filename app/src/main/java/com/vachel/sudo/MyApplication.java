@@ -3,6 +3,7 @@ package com.vachel.sudo;
 import android.app.Application;
 import android.content.Context;
 
+import com.tencent.bugly.Bugly;
 import com.vachel.sudo.dao.DatabaseManager;
 import com.vachel.sudo.engine.ThreadPoolX;
 
@@ -18,6 +19,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        Bugly.init(getApplicationContext(), "5861c6d2c5", true);
         ThreadPoolX.getThreadPool().execute(() -> {
             DatabaseManager.initGreenDao(sInstance);
             DatabaseManager.initCreateAllExams();

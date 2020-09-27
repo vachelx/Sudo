@@ -29,7 +29,7 @@
 
     <color name="btn_stroke">#fbfbfb</color>
     <color name="white_item_pressed">#E5E5E5</color>
-
+    <color name="translation_gray">#626262</color>
 
 
     /* ------------------------------*/

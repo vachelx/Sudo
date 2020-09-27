@@ -3,6 +3,7 @@ package com.vachel.sudo.activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -15,12 +16,14 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
 import com.nineoldandroids.view.ViewHelper;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.MyExpandAdapter;
 import com.vachel.sudo.adapter.PickerAdapter;
 import com.vachel.sudo.bean.SlideItem;
+import com.vachel.sudo.engine.ThreadPoolX;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.manager.ArchiveDataManager;
 import com.vachel.sudo.utils.Constants;
@@ -172,7 +175,8 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             Intent intent = new Intent(ModeSelectActivity.this, SupportActivity.class);
             startActivity(intent);
         } else if (id == R.id.suggestions) {
-
+            Intent intent = new Intent(ModeSelectActivity.this, SuggestionsActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -180,7 +184,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         try {
             PackageManager manager = getPackageManager();
             PackageInfo info = manager.getPackageInfo(getPackageName(), 0);
-            return info.versionName;
+            return info.versionName + "."+info.versionCode;
         } catch (Exception e) {
             e.printStackTrace();
             return "";

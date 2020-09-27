@@ -4,8 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.vachel.sudo.MyApplication;
+import com.vachel.sudo.engine.ThreadPoolX;
 import com.vachel.sudo.manager.ExamDataManager;
 import com.vachel.sudo.engine.Algorithm;
+import com.vachel.sudo.utils.Constants;
 import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
 
@@ -45,7 +47,7 @@ public class DatabaseManager {
     }
 
     public static void initCreateAllExams() {
-        if (PreferencesUtils.getBooleanPreference(MyApplication.getInstance(), "has_create_all_exams", false)) {
+        if (PreferencesUtils.getBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, false)) {
             return;
         }
         for (int i = 0; i < 4; i++) {
@@ -55,9 +57,9 @@ public class DatabaseManager {
                 String examKey = Utils.getExamKey(1, i, 0, j);
                 Examination examination = new Examination(examKey, Utils.sudoToString(sudo), i, j, 3,
                         0, 0, 1, 0);
-                ExamDataManager.getInstance().addOrUpdateExamination(examination);
+                ThreadPoolX.getThreadPool().execute(() -> ExamDataManager.getInstance().addOrUpdateExamination(examination));
             }
         }
-        PreferencesUtils.setBooleanPreference(MyApplication.getInstance(), "has_create_all_exams", true);
+        PreferencesUtils.setBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, true);
     }
 }

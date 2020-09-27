@@ -16,4 +16,14 @@
     <string name="level_list_page">闯关玩法</string>
     <string name="contact_qq">787273366</string>
     <string name="copy_contact_qq">已复制QQ</string>
+    <string name="user_suggestions">反馈建议</string>
+    <string name="suggestion_describe">无论您有任何想法或建议，都可以提交上来，我会认真的考虑并不断的改进！</string>
+    <string name="tips_hint_input">请输入您的建议</string>
+    <string name="user_contact_text">联系方式（选填）</string>
+    <string name="hint_text_your_contacts">Email/QQ/微信/电话均可</string>
+    <string name="submit_suggestion">提 交</string>
+    <string name="network_error">网络不可用，稍后再试！</string>
+    <string name="check_suggestion_empty">建议不能为空</string>
+    <string name="submit_success">提交成功，感谢您的建议！</string>
+    <string name="submit_failed">提交失败，请稍后再试！</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.vachel.sudo.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -147,5 +149,21 @@ public class Utils {
 
     public static int dp2px(Context context, int dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
+    public static synchronized boolean checkNetworkAvailable(Context context) {
+        if (context == null) {
+            return true;
+        }
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            for (NetworkInfo networkInfo : info) {
+                if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

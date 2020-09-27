@@ -22,11 +22,16 @@ public class Constants {
 
 
     /* sharePreferences key*/
+    public static final String HAS_CREATE_ALL_EXAMS= "has_create_all_exams";
     public static final String GAME_MODE= "default_game_mode";
     public static final String GAME_DIFFICULTY= "default_game_difficulty";
+    public static final String LEVEL_GAME_DIFFICULTY= "level_game_difficulty";
     public static final String SHOW_RESUME_ARCHIVE_TIPS = "show_resume_archive_tips";
     public static final String SHOW_TIMER = "show_timer";
     public static final String REMAINING_USEFUL_COUNTS = "remaining_useful_counts";
     public static final String SAVE_TIPS_WHILE_EXIT = "SAVE_TIPS_WHILE_EXIT";
+
+    public static final String SUGGESTION_TEXT = "suggestion_text";
+    public static final String SUGGESTION_USER_CONTACT = "suggestion_user_contact";
 
 }

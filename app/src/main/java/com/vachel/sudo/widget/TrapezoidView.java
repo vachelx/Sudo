@@ -67,7 +67,7 @@ public class TrapezoidView extends BaseIconView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mPaint.setColor(isPressed() || isSelected() ? mDarkBlue: mColorBlue);
+        mPaint.setColor(isPressed() || isSelected() || mIsPressed ? mDarkBlue: mColorBlue);
         int height = getMeasuredHeight();
         int width = getMeasuredWidth();
         mPath.reset();

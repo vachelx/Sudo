@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="@dimen/default_padding"
+        android:background="@color/main_blue">
+
+        <ImageView
+            android:id="@+id/back_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:padding="8dp"
+            android:src="@drawable/selector_arrow_back"
+            app:layout_constraintBottom_toBottomOf="@id/root_title_bar"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:text="@string/user_suggestions"
+            android:textColor="@color/white"
+            android:textSize="@dimen/xx_large_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/back_icon"
+            app:layout_constraintLeft_toRightOf="@id/back_icon"
+            app:layout_constraintTop_toTopOf="@id/back_icon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/default_padding"
+        android:text="@string/suggestion_describe"
+        android:textColor="@color/default_text_color"
+        android:textSize="@dimen/large_text_size"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/default_padding"
+        android:layout_marginTop="@dimen/default_padding"
+        android:text="@string/user_suggestions"
+        android:textStyle="bold"
+        android:textColor="@color/default_text_color"
+        android:textSize="@dimen/large_text_size"/>
+
+    <EditText
+        android:id="@+id/suggestion_text"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:background="@drawable/suggestion_edit_text_bg"
+        android:textSize="@dimen/default_text_size"
+        android:padding="8dp"
+        android:textColor="@color/default_text_color"
+        android:hint="@string/tips_hint_input"
+        android:gravity="start"
+        android:maxLength="600"
+        />
+
+    <TextView
+        android:id="@+id/suggestion_length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/translation_gray"
+        android:paddingLeft="28dp"
+        android:textSize="@dimen/small_text_size"
+        android:text="0/600"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/default_padding"
+        android:layout_marginTop="@dimen/default_padding"
+        android:text="@string/user_contact_text"
+        android:textStyle="bold"
+        android:textColor="@color/default_text_color"
+        android:textSize="@dimen/large_text_size"/>
+
+    <EditText
+        android:id="@+id/user_contact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:background="@drawable/suggestion_edit_text_bg"
+        android:textSize="@dimen/default_text_size"
+        android:padding="8dp"
+        android:textColor="@color/default_text_color"
+        android:hint="@string/hint_text_your_contacts"
+        android:gravity="start"
+        android:maxLength="100"
+        />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/submit_suggestion"
+        android:textColor="@color/white"
+        android:textSize="@dimen/x_large_text_size"
+        android:background="@drawable/blue_btn_selector"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
