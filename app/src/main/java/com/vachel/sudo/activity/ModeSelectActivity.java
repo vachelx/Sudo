@@ -106,7 +106,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         mExpandList = findViewById(R.id.expand_list);
         mExpandList.setGroupIndicator(null);
         mExpandList.setAdapter(new MyExpandAdapter(this));
-        mExpandList.expandGroup(0);
+//        mExpandList.expandGroup(0);
 
         findViewById(R.id.suggestions).setOnClickListener(this);
         findViewById(R.id.support).setOnClickListener(this);
@@ -200,8 +200,10 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
 
     @Subscriber(tag = EventTag.SHOW_RESUME_ARCHIVE_TIPS, mode = ThreadMode.MAIN)
     public void onSaveArchive(boolean show) {
-        mExpandList.collapseGroup(0);
-        mExpandList.expandGroup(0);
+        if (mExpandList.isGroupExpanded(0)){
+            mExpandList.collapseGroup(0);
+            mExpandList.expandGroup(0);
+        }
     }
 
     @Override

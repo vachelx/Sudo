@@ -1,5 +1,7 @@
 package com.vachel.sudo.engine;
 
+import com.vachel.sudo.BuildConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -98,17 +100,13 @@ public class Algorithm {
 
     private static int getBlankCount(int type) {
         if (type == 0) {
-//            return 37; // 容易
-            return 5;
+            return BuildConfig.DEBUG ? 5 : 37; // 容易
         } else if (type == 1) {
-//            return 46; // 中等
-            return 25;
+            return 46; // 中等
         } else if (type == 2) {
-//            return 51; // 困难
-            return 37;
+            return 51; // 困难
         } else {
-            return 42;
-//            return 55; // 专家
+            return 55; // 专家
         }
     }
 
