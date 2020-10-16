@@ -45,21 +45,4 @@ public class DatabaseManager {
     public static ArchiveBeanDao getArchiveBeanDao(){
         return getDaoSession().getArchiveBeanDao();
     }
-
-    public static void initCreateAllExams() {
-        if (PreferencesUtils.getBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, false)) {
-            return;
-        }
-        for (int i = 0; i < 4; i++) {
-            int count = 999;
-            for (int j = 0; j < count; j++) {
-                Integer[][] sudo = Algorithm.getExamSudo(i);
-                String examKey = Utils.getExamKey(1, i, 0, j);
-                Examination examination = new Examination(examKey, Utils.sudoToString(sudo), i, j, 3,
-                        0, 0, 1, 0);
-                ThreadPoolX.getThreadPool().execute(() -> ExamDataManager.getInstance().addOrUpdateExamination(examination));
-            }
-        }
-        PreferencesUtils.setBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, true);
-    }
 }

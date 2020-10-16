@@ -51,18 +51,18 @@
     <Button
         android:id="@+id/support_pay"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:text="打赏"
         android:layout_marginTop="30dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:background="@drawable/blue_btn_selector"
         android:textColor="@color/white"
-        android:textSize="@dimen/x_large_text_size"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     <LinearLayout

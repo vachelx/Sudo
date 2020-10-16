@@ -1,4 +1,4 @@
-package com.hu.easycall.service;
+package com.vachel.sudo.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,10 +8,7 @@ import android.os.IBinder;
 import android.os.Message;
 
 import androidx.annotation.Nullable;
-
-import com.hu.easycall.util.LogUtil;
-import com.hu.easycall.util.NotificationUtil;
-
+import com.vachel.sudo.utils.NotificationUtil;
 import java.lang.ref.WeakReference;
 
 public abstract class BaseService extends Service {
@@ -25,6 +22,7 @@ public abstract class BaseService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForeground(1, NotificationUtil.createServiceForegroundNotification(this));
         }
+        mHandler = new CXServiceHandler(this);
     }
 
     @Nullable
@@ -47,9 +45,6 @@ public abstract class BaseService extends Service {
     public boolean checkIntent(Intent intent) {
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(STOP_ACTION)) {
-                if (mHandler == null) {
-                    mHandler = new CXServiceHandler(this);
-                }
                 isCancelStopService = false;
                 mHandler.sendMessageDelayed(mHandler.obtainMessage(0), 500);
                 return false;
@@ -80,7 +75,6 @@ public abstract class BaseService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LogUtil.d("jlx", "service onDestory :" + this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             stopForeground(true);
         }

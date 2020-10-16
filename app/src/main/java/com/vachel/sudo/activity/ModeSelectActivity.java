@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -39,13 +38,13 @@ import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
 import org.simple.eventbus.ThreadMode;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import static android.view.View.DRAWING_CACHE_QUALITY_HIGH;
 
 public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
     private int mSelectDifficulty;
@@ -261,6 +260,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
 
     private synchronized Bitmap getQrCodeBitmap() {
         mIconView.setDrawingCacheEnabled(true);
+        mIconView.setDrawingCacheQuality(DRAWING_CACHE_QUALITY_HIGH);
         Bitmap mQrContentBitmap = mIconView.getDrawingCache();
         mQrContentBitmap = Bitmap.createBitmap(mQrContentBitmap, 0, 0, mIconView.getWidth(), mIconView.getHeight());
         mIconView.setDrawingCacheEnabled(false);

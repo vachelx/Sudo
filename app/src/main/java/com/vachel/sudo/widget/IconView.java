@@ -22,12 +22,13 @@ public class IconView extends BaseIconView {
     private float mDiffPadding = 16;
     private float mTextSize;
     private String[][] mText = new String[][]{
-            {null, "1", null},
-            {"7", "?", "5"},
-            {null, "3", null}
+            {null, "3", null},
+            {"1", "?", "7"},
+            {null, "5", null}
     };
     private Bitmap mBitmap;
     private RectF mRectF;
+    private int mWhiteA;
 
     public IconView(Context context) {
         super(context);
@@ -43,6 +44,7 @@ public class IconView extends BaseIconView {
 
     @Override
     protected void initExtra(AttributeSet attrs) {
+        mWhiteA = getContext().getResources().getColor(R.color.white_a);
         initBitmap();
     }
 
@@ -68,11 +70,12 @@ public class IconView extends BaseIconView {
             initBitmap();
         }
         canvas.drawBitmap(mBitmap, null, mRectF, mPaint);
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(mWhiteA);
         canvas.drawLine(mDiffPadding + cellWidth, mDiffPadding, mDiffPadding + cellWidth, height- mDiffPadding, mPaint);
         canvas.drawLine(mDiffPadding + cellWidth*2, mDiffPadding, mDiffPadding + cellWidth*2, height- mDiffPadding, mPaint);
         canvas.drawLine(mDiffPadding, mDiffPadding + cellWidth, width-mDiffPadding, mDiffPadding + cellWidth, mPaint);
         canvas.drawLine(mDiffPadding, mDiffPadding + cellWidth*2, width-mDiffPadding, mDiffPadding + cellWidth*2, mPaint);
+        mPaint.setColor(Color.WHITE);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 String text = mText[i][j];

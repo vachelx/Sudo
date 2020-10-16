@@ -24,5 +24,5 @@
         android:textColor="@color/black"
         android:maxLines="1"
         android:ellipsize="end"
-        android:text="91融客云呼叫运行中，请勿关闭"/>
+        android:text=" 氢数独正在生成题库，请勿关闭"/>
 </RelativeLayout>

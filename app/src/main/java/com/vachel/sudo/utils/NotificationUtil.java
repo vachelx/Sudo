@@ -1,4 +1,4 @@
-package com.hu.easycall.util;
+package com.vachel.sudo.utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,8 +12,9 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
-import com.hu.easycall.MyApplication;
-import com.hu.easycall.R;
+import com.vachel.sudo.MyApplication;
+import com.vachel.sudo.R;
+
 
 public class NotificationUtil {
     private static final String WEB_SOCKET_CHANNEL_ID = "web_socket_channel_id";

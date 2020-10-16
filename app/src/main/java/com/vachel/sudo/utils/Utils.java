@@ -15,6 +15,11 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.vachel.sudo.MyApplication;
+import com.vachel.sudo.dao.Examination;
+import com.vachel.sudo.engine.Algorithm;
+import com.vachel.sudo.engine.ThreadPoolX;
+import com.vachel.sudo.manager.ExamDataManager;
+import com.vachel.sudo.service.ExamsCreateService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +31,8 @@ import java.util.Date;
 import java.util.TreeSet;
 
 public class Utils {
+    public static final String MEDIA_SAVE_PATH = Environment.DIRECTORY_DCIM + "/sudo/";
+
     public static final String[] mPermissionList = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -204,7 +211,7 @@ public class Utils {
                 file.createNewFile();
             }
             fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             return true;
         } catch (IOException e) {
@@ -221,7 +228,6 @@ public class Utils {
         }
     }
 
-    public static final String MEDIA_SAVE_PATH = Environment.DIRECTORY_DCIM + "/sudo/";
     public static boolean saveBitmapWithAndroidQ(Bitmap bitmap, String displayName) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, displayName);
@@ -240,5 +246,26 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public static void initCreateAllExams(final ExamsCreateService.ICreateExamsCallback callback) {
+        if (PreferencesUtils.getBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, false)) {
+            return;
+        }
+        for (int i = 0; i < 4; i++) {
+            int count = 999;
+            for (int j = 0; j < count; j++) {
+                Integer[][] sudo = Algorithm.getExamSudo(i);
+                String examKey = Utils.getExamKey(1, i, 0, j);
+                Examination examination = new Examination(examKey, Utils.sudoToString(sudo), i, j, 3,
+                        0, 0, 1, 0);
+                final int currentIndex = j;
+                ThreadPoolX.getThreadPool().execute(() -> {
+                    ExamDataManager.getInstance().addOrUpdateExamination(examination);
+                    callback.onCreateIndex(currentIndex);
+                });
+            }
+        }
+        PreferencesUtils.setBooleanPreference(MyApplication.getInstance(), Constants.HAS_CREATE_ALL_EXAMS, true);
     }
 }
