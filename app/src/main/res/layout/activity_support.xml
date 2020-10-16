@@ -48,22 +48,19 @@
         android:layout_marginRight="10dp"
         android:textStyle="italic" />
 
-    <ImageView
-        android:layout_width="200dp"
+    <Button
+        android:id="@+id/support_pay"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@mipmap/wechat_support" />
-
-    <TextView
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/wechat_green"
         android:gravity="center"
-        android:text="vachel"
-        android:layout_marginTop="-8dp"
-        android:paddingBottom="8dp"
+        android:text="打赏"
+        android:layout_marginTop="30dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/blue_btn_selector"
         android:textColor="@color/white"
         android:textSize="@dimen/x_large_text_size"
         android:textStyle="bold" />
