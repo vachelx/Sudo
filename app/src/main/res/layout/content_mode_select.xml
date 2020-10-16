@@ -35,6 +35,13 @@
         android:orientation="vertical"
         android:paddingBottom="40dp">
 
+        <com.vachel.sudo.widget.IconView
+            android:id="@+id/icon_view"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:elevation="15dp"
+            android:layout_marginBottom="50dp"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

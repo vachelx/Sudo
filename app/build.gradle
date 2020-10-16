@@ -4,10 +4,12 @@ apply plugin: 'org.greenrobot.greendao'
 android {
     signingConfigs {
         release {
-            storeFile file('E:\\project\\Sudo\\key\\keystore.jks')
+            storeFile file('keystore.jks')
             storePassword 'cici123'
             keyAlias = 'vachel'
             keyPassword 'cici123'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     compileSdkVersion 29
@@ -43,6 +45,15 @@ android {
         daoPackage 'com.vachel.sudo.dao'//greendao 自动生成的辅助类
         targetGenDir 'src/main/java'//固定目录
     }
+
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                output ->
+                    outputFileName = "LightSudo_${variant.versionName}" + ".apk"
+            }
+    }
+
 }
 
 dependencies {

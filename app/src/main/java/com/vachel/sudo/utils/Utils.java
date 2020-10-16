@@ -1,18 +1,36 @@
 package com.vachel.sudo.utils;
 
+import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.vachel.sudo.MyApplication;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeSet;
 
 public class Utils {
+    public static final String[] mPermissionList = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+
     // 检查填写完整度
     public static boolean checkInputFinish(Integer[][] sudo) {
         for (int i = 0; i < 9; i++) {
@@ -162,6 +180,63 @@ public class Utils {
                 if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public static String getSaveFilePath(String fileName) {
+        File sdCard = Environment.getExternalStorageDirectory();
+        File outputDirectory = new File(sdCard.getAbsolutePath() + File.separator + "sudo");
+        outputDirectory.mkdirs();
+        return outputDirectory.getAbsolutePath() + File.separator + fileName;
+    }
+
+    public static boolean saveBitmapFile(Bitmap bitmap, String filePath) {
+        if (bitmap == null) { //
+            return false;
+        }
+        FileOutputStream fos = null;
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static final String MEDIA_SAVE_PATH = Environment.DIRECTORY_DCIM + "/sudo/";
+    public static boolean saveBitmapWithAndroidQ(Bitmap bitmap, String displayName) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, displayName);
+        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, MEDIA_SAVE_PATH);
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        ContentResolver contentResolver = MyApplication.getContext().getContentResolver();
+        Uri insertUri = contentResolver.insert(uri, contentValues);
+        if (insertUri != null) {
+            try (OutputStream outputStream = contentResolver.openOutputStream(insertUri)){
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    return true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return false;

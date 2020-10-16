@@ -3,26 +3,27 @@ package com.vachel.sudo.activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
 import com.nineoldandroids.view.ViewHelper;
-import com.tencent.bugly.crashreport.CrashReport;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.vachel.sudo.R;
 import com.vachel.sudo.adapter.MyExpandAdapter;
 import com.vachel.sudo.adapter.PickerAdapter;
-import com.vachel.sudo.bean.SlideItem;
 import com.vachel.sudo.engine.ThreadPoolX;
 import com.vachel.sudo.helper.PageChangedListener;
 import com.vachel.sudo.manager.ArchiveDataManager;
@@ -32,11 +33,13 @@ import com.vachel.sudo.utils.EventTag;
 import com.vachel.sudo.utils.PreferencesUtils;
 import com.vachel.sudo.utils.Utils;
 import com.vachel.sudo.widget.BaseAlertDialog;
+import com.vachel.sudo.widget.IconView;
 
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
 import org.simple.eventbus.ThreadMode;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
@@ -49,6 +52,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     private View mResumeView;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mExpandList;
+    private IconView mIconView;
 
     @Override
     int getLayoutId() {
@@ -111,6 +115,8 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         findViewById(R.id.suggestions).setOnClickListener(this);
         findViewById(R.id.support).setOnClickListener(this);
         findViewById(R.id.about).setOnClickListener(this);
+        mIconView = findViewById(R.id.icon_view);
+//        mIconView.setOnClickListener(this);
     }
 
     private void updateResumeView(final int difficulty) {
@@ -177,6 +183,8 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
         } else if (id == R.id.suggestions) {
             Intent intent = new Intent(ModeSelectActivity.this, SuggestionsActivity.class);
             startActivity(intent);
+        } else if (id == R.id.icon_view){
+            handleSaveClick();
         }
     }
 
@@ -219,5 +227,59 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             return;
         }
         super.onBackPressed();
+    }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            checkPermission(0);
+//        }
+//    }
+
+    private void checkPermission(int index) {
+        int hasPermission = ContextCompat.checkSelfPermission(this, Utils.mPermissionList[index]);
+        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Utils.mPermissionList[index]}, index + 1);
+        } else if (index < Utils.mPermissionList.length - 1) {
+            checkPermission(index + 1);
+        }
+    }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+////        boolean success = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+////        switch (requestCode) {
+////            case 1: // WRITE_EXTERNAL_STORAGE
+////                break;
+////        }
+//        if (requestCode < Utils.mPermissionList.length) {
+//            checkPermission(requestCode);
+//        }
+//    }
+
+    private synchronized Bitmap getQrCodeBitmap() {
+        mIconView.setDrawingCacheEnabled(true);
+        Bitmap mQrContentBitmap = mIconView.getDrawingCache();
+        mQrContentBitmap = Bitmap.createBitmap(mQrContentBitmap, 0, 0, mIconView.getWidth(), mIconView.getHeight());
+        mIconView.setDrawingCacheEnabled(false);
+        return mQrContentBitmap;
+    }
+
+    private void handleSaveClick() {
+        final Bitmap bitmap = getQrCodeBitmap();
+        ThreadPoolX.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                String displayName = "icon_bitmap.jpg";
+                if (Build.VERSION.SDK_INT >= 29) {
+                    Utils.saveBitmapWithAndroidQ(bitmap, displayName);
+                } else {
+                    Utils.saveBitmapFile(bitmap, Utils.getSaveFilePath(displayName));
+                }
+
+            }
+        });
     }
 }
