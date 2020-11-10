@@ -46,7 +46,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import static android.view.View.DRAWING_CACHE_QUALITY_HIGH;
 
-public class ModeSelectActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private int mSelectDifficulty;
     private View mResumeView;
     private DrawerLayout mDrawerLayout;
@@ -124,7 +124,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(ModeSelectActivity.this, Lifecycle.Event.ON_DESTROY)))
+                .as(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(MainActivity.this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(result -> {
                     mResumeView.setClickable(result);
                     mResumeView.setVisibility(result ? View.VISIBLE : View.INVISIBLE);
@@ -148,7 +148,7 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
             public void onSelected(int position) {
                 mSelectDifficulty = position % adapter.getDataCount();
                 updateResumeView(mSelectDifficulty);
-                PreferencesUtils.setIntegerPrefrence(ModeSelectActivity.this, Constants.GAME_DIFFICULTY, mSelectDifficulty);
+                PreferencesUtils.setIntegerPrefrence(MainActivity.this, Constants.GAME_DIFFICULTY, mSelectDifficulty);
             }
         });
     }
@@ -157,17 +157,17 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.statistics) {
-            Intent intent = new Intent(ModeSelectActivity.this, StatisticsActivity.class);
+            Intent intent = new Intent(MainActivity.this, StatisticsActivity.class);
             startActivity(intent);
         } else if (id == R.id.start_game || id == R.id.resume_game) {
-            Intent intent = new Intent(ModeSelectActivity.this, SudoActivity.class);
+            Intent intent = new Intent(MainActivity.this, SudoActivity.class);
             int[] nextKey = new int[4];
             nextKey[1] = mSelectDifficulty;
             intent.putExtra(Constants.KEY_EXAM, nextKey);
             intent.putExtra(Constants.KEY_RESUME, id == R.id.resume_game);
             startActivity(intent);
         } else if (id == R.id.level_mode) {
-            Intent intent = new Intent(ModeSelectActivity.this, LevelActivity.class);
+            Intent intent = new Intent(MainActivity.this, LevelActivity.class);
             intent.putExtra(Constants.KEY_DIFFICULTY, mSelectDifficulty);
             startActivity(intent);
         } else if(id == R.id.setting){
@@ -177,10 +177,10 @@ public class ModeSelectActivity extends BaseActivity implements View.OnClickList
                     .contentGravityCenter(true)
                     .show(getSupportFragmentManager(), "");
         } else if (id == R.id.support) {
-            Intent intent = new Intent(ModeSelectActivity.this, SupportActivity.class);
+            Intent intent = new Intent(MainActivity.this, SupportActivity.class);
             startActivity(intent);
         } else if (id == R.id.suggestions) {
-            Intent intent = new Intent(ModeSelectActivity.this, SuggestionsActivity.class);
+            Intent intent = new Intent(MainActivity.this, SuggestionsActivity.class);
             startActivity(intent);
         } else if (id == R.id.icon_view){
             handleSaveClick();

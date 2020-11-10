@@ -81,6 +81,7 @@ public class SuggestionsActivity extends BaseActivity implements View.OnClickLis
             final String tips = TextUtils.isEmpty(user) ? text : "contact:" + user + ";" + text;
             ThreadPoolX.getThreadPool().execute(() -> {
                 try {
+                    // 没有后端 这里偷懒提交到bugly里了￣□￣｜｜ 不推荐。。。
                     Throwable throwable = new Throwable(tips);
                     CrashReport.postCatchedException(throwable);
                     runOnUiThread(() -> {

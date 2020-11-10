@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeSet;
 
@@ -195,7 +194,9 @@ public class Utils {
     public static String getSaveFilePath(String fileName) {
         File sdCard = Environment.getExternalStorageDirectory();
         File outputDirectory = new File(sdCard.getAbsolutePath() + File.separator + "sudo");
-        outputDirectory.mkdirs();
+        if (!outputDirectory.exists()) {
+            outputDirectory.mkdirs();
+        }
         return outputDirectory.getAbsolutePath() + File.separator + fileName;
     }
 
