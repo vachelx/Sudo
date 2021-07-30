@@ -26,8 +26,8 @@ public class SaveIcon extends BaseIconView {
         int width = getMeasuredWidth();
 
         float offset = height * 1.0f / 5;
-        float useSize = height / 2 - offset;
-        canvas.drawLine(width/2 - useSize, height * 1f / 2 - mPaintWidth / 6, width/2 - useSize/2 + mPaintWidth / 5, height * 2f / 3 + mPaintWidth / 6, mPaint);
-        canvas.drawLine(width/2 - useSize/2  - mPaintWidth / 5, height * 2f / 3 + mPaintWidth / 6, width/2 + useSize, height * 1f / 3, mPaint);
+        float useSize = height / 2f - offset;
+        canvas.drawLine(width/2f - useSize, height * 1f / 2 - mPaintWidth / 6f, width/2f - useSize/2 + mPaintWidth / 5f, height * 2f / 3 + mPaintWidth / 6f, mPaint);
+        canvas.drawLine(width/2f - useSize/2  - mPaintWidth / 5f, height * 2f / 3 + mPaintWidth / 6f, width/2f + useSize, height * 1f / 3, mPaint);
     }
 }

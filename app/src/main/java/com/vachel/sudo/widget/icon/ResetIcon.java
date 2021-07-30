@@ -31,9 +31,9 @@ public class ResetIcon extends BaseIconView {
         canvas.drawArc(getOval(width, height), 0, 320, false, mPaint);
         int useSize = height / 2 - height / 6;
         mPath.reset();
-        mPath.moveTo(width / 2 + useSize - mPaintWidth / 2, height / 2);
-        mPath.lineTo(width / 2 + useSize, height / 2 - mPaintWidth / 2);
-        mPath.lineTo(width / 2 + useSize + mPaintWidth / 2, height / 2);
+        mPath.moveTo(width / 2f + useSize - mPaintWidth / 2f, height / 2f);
+        mPath.lineTo(width / 2f + useSize, height / 2f - mPaintWidth / 2f);
+        mPath.lineTo(width / 2f + useSize + mPaintWidth / 2f, height / 2f);
         mPath.close();
         canvas.drawPath(mPath, mPaint);
     }
@@ -42,7 +42,7 @@ public class ResetIcon extends BaseIconView {
         if (mOval == null) {
             int offset = height / 6;
             int useSize = height / 2 - offset;
-            mOval = new RectF(width / 2 - useSize, offset, width / 2 + useSize, height - offset);
+            mOval = new RectF(width / 2f - useSize, offset, width / 2f + useSize, height - offset);
         }
         return mOval;
     }

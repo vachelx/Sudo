@@ -124,11 +124,11 @@ public class LevelItem extends BaseIconView {
         } else if (mIsPressed) {
             mBgPaint.setColor(mColorGreyDark);
             mBgPaint.setStyle(Paint.Style.FILL);
-            canvas.drawCircle(center, center, (width - mDiffPadding * 2) / 2, mBgPaint);
+            canvas.drawCircle(center, center, (width - mDiffPadding * 2) / 2f, mBgPaint);
         } else {
             mBgPaint.setStyle(Paint.Style.FILL);
             mBgPaint.setColor(isSelected() ? mColorBlue : mColorGreen);
-            canvas.drawCircle(center, center, (width - mDiffPadding * 2) / 2, mBgPaint);
+            canvas.drawCircle(center, center, (width - mDiffPadding * 2) / 2f, mBgPaint);
         }
 
         if (!TextUtils.isEmpty(mLevelText)) {
@@ -140,7 +140,7 @@ public class LevelItem extends BaseIconView {
                 canvas.drawText(mLevelText, center - keyOffsetX, height - mDiffPadding * 1.5f, mTextPaint);
                 mTextPaint.setTypeface(Typeface.SERIF);
                 mTextPaint.setColor(isSelected() && mHasArchive ? Color.YELLOW : Color.WHITE);
-                canvas.drawText(mTakeText, center - mTextPaint.measureText(mTakeText) / 2, center + offSetY - mDiffPadding / 2f, mTextPaint);
+                canvas.drawText(mTakeText, center - mTextPaint.measureText(mTakeText) / 2f, center + offSetY - mDiffPadding / 2f, mTextPaint);
             } else {
                 canvas.drawText(mLevelText, center - keyOffsetX, center + offSetY, mTextPaint);
             }

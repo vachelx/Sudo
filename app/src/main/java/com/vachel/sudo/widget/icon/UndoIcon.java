@@ -26,14 +26,14 @@ public class UndoIcon extends BaseIconView {
         int width = getMeasuredWidth();
 
         float offset = height * 1.0f / 5;
-        float useSize = height / 2 - offset;
-        canvas.drawLine(width / 2 + useSize, height / 2 + height / 6, width / 2 - useSize + mPaintWidth / 2, height / 2 + height / 6, mPaint);
-        float locX = width / 2 - useSize + mPaintWidth;
-        canvas.drawLine(locX, height / 2 + height / 6, locX, height / 2 - height / 6, mPaint);
+        float useSize = height / 2f - offset;
+        canvas.drawLine(width / 2f + useSize, height / 2f + height / 6f, width / 2f - useSize + mPaintWidth / 2f, height / 2f + height / 6f, mPaint);
+        float locX = width / 2f - useSize + mPaintWidth;
+        canvas.drawLine(locX, height / 2f + height / 6f, locX, height / 2f - height / 6f, mPaint);
         mPath.reset();
-        mPath.moveTo(locX - mPaintWidth / 2, height / 2 - height / 6);
-        mPath.lineTo(locX, height / 2 - height / 6 - mPaintWidth);
-        mPath.lineTo(locX + mPaintWidth / 2, height / 2 - height / 6);
+        mPath.moveTo(locX - mPaintWidth / 2f, height / 2f - height / 6f);
+        mPath.lineTo(locX, height / 2f - height / 6f - mPaintWidth);
+        mPath.lineTo(locX + mPaintWidth / 2f, height / 2f - height / 6f);
         mPath.close();
         canvas.drawPath(mPath, mPaint);
     }
